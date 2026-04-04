@@ -8,8 +8,8 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #0a0a0a;
-      color: #e0e0e0;
+      background: #1c1c1c;
+      color: #d8d8d8;
       font-family: monospace;
       display: flex;
       flex-direction: column;
@@ -19,18 +19,18 @@
       padding: 40px 24px;
     }
     h1 { font-size: 1.4rem; letter-spacing: 0.15em; color: #fff; }
-    h2 { font-size: 0.85rem; letter-spacing: 0.12em; color: #aaa; margin-top: 8px; }
+    h2 { font-size: 0.9rem; letter-spacing: 0.12em; color: #aaa; margin-top: 8px; }
     .flash-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
     }
-    p { font-size: 0.85rem; color: #888; max-width: 380px; text-align: center; line-height: 1.6; }
+    p { font-size: 0.9rem; color: #aaa; max-width: 380px; text-align: center; line-height: 1.6; }
     esp-web-install-button::part(button) {
-      background: #1a1a1a;
+      background: #2a2a2a;
       color: #fff;
-      border: 1px solid #333;
+      border: 1px solid #555;
       border-radius: 6px;
       padding: 12px 28px;
       font-family: monospace;
@@ -38,53 +38,54 @@
       cursor: pointer;
       letter-spacing: 0.08em;
     }
-    esp-web-install-button::part(button):hover { border-color: #666; }
-    .version { font-size: 0.75rem; color: #444; }
+    esp-web-install-button::part(button):hover { border-color: #999; }
+    .version { font-size: 0.8rem; color: #666; }
 
     /* Guía */
     .guide {
       width: 100%;
-      max-width: 560px;
-      border-top: 1px solid #1e1e1e;
+      max-width: 580px;
+      border-top: 1px solid #333;
       padding-top: 28px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 22px;
     }
     .guide h3 {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       letter-spacing: 0.18em;
-      color: #555;
+      color: #888;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .guide table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-size: 0.92rem;
     }
     .guide td {
-      padding: 4px 0;
+      padding: 5px 0;
       vertical-align: top;
       line-height: 1.5;
     }
     .guide td:first-child {
-      color: #bbb;
+      color: #e8e8e8;
       white-space: nowrap;
-      padding-right: 20px;
+      padding-right: 24px;
       min-width: 180px;
     }
-    .guide td:last-child { color: #666; }
+    .guide td:last-child { color: #999; }
     .guide .note {
-      font-size: 0.75rem;
-      color: #444;
+      font-size: 0.82rem;
+      color: #666;
       padding-left: 2px;
+      margin-top: 4px;
     }
     .preset-dot {
       display: inline-block;
-      width: 8px; height: 8px;
+      width: 9px; height: 9px;
       border-radius: 50%;
-      margin-right: 6px;
+      margin-right: 7px;
       vertical-align: middle;
     }
   </style>
