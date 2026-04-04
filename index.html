@@ -14,13 +14,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
       gap: 24px;
-      padding: 32px;
+      padding: 40px 24px;
     }
     h1 { font-size: 1.4rem; letter-spacing: 0.15em; color: #fff; }
-    p  { font-size: 0.85rem; color: #888; max-width: 380px; text-align: center; line-height: 1.6; }
+    h2 { font-size: 0.85rem; letter-spacing: 0.12em; color: #aaa; margin-top: 8px; }
+    .flash-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    p { font-size: 0.85rem; color: #888; max-width: 380px; text-align: center; line-height: 1.6; }
     esp-web-install-button::part(button) {
       background: #1a1a1a;
       color: #fff;
@@ -32,16 +38,148 @@
       cursor: pointer;
       letter-spacing: 0.08em;
     }
-    esp-web-install-button::part(button):hover {
-      border-color: #666;
-    }
+    esp-web-install-button::part(button):hover { border-color: #666; }
     .version { font-size: 0.75rem; color: #444; }
+
+    /* Guía */
+    .guide {
+      width: 100%;
+      max-width: 560px;
+      border-top: 1px solid #1e1e1e;
+      padding-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .guide h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: #555;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .guide table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .guide td {
+      padding: 4px 0;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .guide td:first-child {
+      color: #bbb;
+      white-space: nowrap;
+      padding-right: 20px;
+      min-width: 180px;
+    }
+    .guide td:last-child { color: #666; }
+    .guide .note {
+      font-size: 0.75rem;
+      color: #444;
+      padding-left: 2px;
+    }
+    .preset-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
+
   <h1>odesEucli</h1>
-  <p>Conecta el dispositivo por USB, haz clic en el botón e instala el firmware.<br>Requiere Chrome o Edge.</p>
-  <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
-  <span class="version">v2.0.0 — ESP32-S3</span>
+  <h2>Secuenciador Euclidiano / Lineal — ESP32-S3</h2>
+
+  <div class="flash-area">
+    <p>Conecta el dispositivo por USB, haz clic en el botón e instala el firmware.<br>Requiere Chrome o Edge.</p>
+    <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
+    <span class="version">v2.0.0 — ESP32-S3</span>
+  </div>
+
+  <div class="guide">
+
+    <div>
+      <h3>Play / Stop</h3>
+      <table><tbody>
+        <tr><td>B5</td><td>Play / Stop</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Canal activo</h3>
+      <table><tbody>
+        <tr><td>B3</td><td>Canal anterior</td></tr>
+        <tr><td>B4</td><td>Canal siguiente</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Encoder</h3>
+      <table><tbody>
+        <tr><td>Girar</td><td>K — cantidad de golpes</td></tr>
+        <tr><td>SW + girar</td><td>Rotación del patrón</td></tr>
+        <tr><td>B2 + girar</td><td>Cantidad de acentos</td></tr>
+        <tr><td>B2 + SW + girar</td><td>Rotación de acentos</td></tr>
+        <tr><td>B1 + girar</td><td>BPM ±1</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Potenciómetros</h3>
+      <table><tbody>
+        <tr><td>Pot4</td><td>Pitch (±18 semitonos)</td></tr>
+        <tr><td>Pot5</td><td>Velocity del canal activo</td></tr>
+        <tr><td>Pot6</td><td>Volumen master</td></tr>
+        <tr><td>B2 + Pot4</td><td>Intervalo del acento</td></tr>
+        <tr><td>B2 + Pot5</td><td>Paneo</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Modo lineal</h3>
+      <table><tbody>
+        <tr><td>B2 + B3</td><td>Activa / desactiva modo lineal en el canal activo</td></tr>
+        <tr><td>Girar encoder</td><td>Mueve el cursor por los 16 pasos</td></tr>
+        <tr><td>SW press</td><td>Activa / desactiva el paso bajo el cursor</td></tr>
+      </tbody></table>
+      <p class="note">LED blanco pequeño encendido = canal en modo lineal</p>
+    </div>
+
+    <div>
+      <h3>Otros</h3>
+      <table><tbody>
+        <tr><td>B2 + B1</td><td>Activa / desactiva doble tempo (2x) en el canal activo</td></tr>
+        <tr><td>B1</td><td>Tap tempo</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Presets — 48 en total</h3>
+      <table><tbody>
+        <tr>
+          <td><span class="preset-dot" style="background:#2d8a2d"></span>Verde (0–15)</td>
+          <td>Factory euclidiano</td>
+        </tr>
+        <tr>
+          <td><span class="preset-dot" style="background:#c86400"></span>Naranja (16–31)</td>
+          <td>Factory hiphop</td>
+        </tr>
+        <tr>
+          <td><span class="preset-dot" style="background:#1a4fa8"></span>Azul (32–47)</td>
+          <td>Usuario (guardados en memoria)</td>
+        </tr>
+      </tbody></table>
+      <table style="margin-top:8px"><tbody>
+        <tr><td>B6 press corto</td><td>Entrar / salir modo carga — encoder navega, SW carga</td></tr>
+        <tr><td>B6 hold 2s</td><td>Modo guardar slots 32–47 — encoder elige, SW hold 2s guarda</td></tr>
+      </tbody></table>
+    </div>
+
+  </div>
+
 </body>
 </html>
