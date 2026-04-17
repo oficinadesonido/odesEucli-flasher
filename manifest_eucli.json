@@ -1,0 +1,12 @@
+{
+  "name": "odesEucli",
+  "version": "2.0.1",
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        { "path": "firmware.bin", "offset": 0 }
+      ]
+    }
+  ]
+}

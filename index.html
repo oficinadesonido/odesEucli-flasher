@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>odesEucli — Flasher</title>
+  <title>odes — Flasher</title>
   <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,11 +15,36 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      gap: 24px;
+      gap: 28px;
       padding: 40px 24px;
     }
     h1 { font-size: 1.4rem; letter-spacing: 0.15em; color: #fff; }
-    h2 { font-size: 0.9rem; letter-spacing: 0.12em; color: #aaa; margin-top: 8px; }
+
+    /* ── Selector de firmware ── */
+    .selector {
+      display: flex;
+      gap: 10px;
+    }
+    .sel-btn {
+      background: #2a2a2a;
+      color: #888;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px 28px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .sel-btn:hover { border-color: #888; color: #ccc; }
+    .sel-btn.active {
+      border-color: #aaa;
+      color: #fff;
+      background: #333;
+    }
+
+    /* ── Flash area ── */
     .flash-area {
       display: flex;
       flex-direction: column;
@@ -41,7 +66,7 @@
     esp-web-install-button::part(button):hover { border-color: #999; }
     .version { font-size: 0.8rem; color: #666; }
 
-    /* Guía */
+    /* ── Guías ── */
     .guide {
       width: 100%;
       max-width: 580px;
@@ -51,6 +76,7 @@
       flex-direction: column;
       gap: 22px;
     }
+    .guide.hidden { display: none; }
     .guide h3 {
       font-size: 0.75rem;
       letter-spacing: 0.18em;
@@ -72,7 +98,7 @@
       color: #e8e8e8;
       white-space: nowrap;
       padding-right: 24px;
-      min-width: 180px;
+      min-width: 200px;
     }
     .guide td:last-child { color: #999; }
     .guide .note {
@@ -88,20 +114,28 @@
       margin-right: 7px;
       vertical-align: middle;
     }
+    .timbre-row td:first-child { min-width: 80px; }
   </style>
 </head>
 <body>
 
-  <h1>odesEucli</h1>
-  <h2>Secuenciador Euclidiano / Lineal — ESP32-S3</h2>
+  <h1>odes</h1>
 
-  <div class="flash-area">
-    <p>Conecta el dispositivo por USB, haz clic en el botón e instala el firmware.<br>Requiere Chrome o Edge.</p>
-    <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
-    <span class="version">v2.0.0 — ESP32-S3</span>
+  <div class="selector">
+    <button class="sel-btn active" id="btn-eucli">odesEucli</button>
+    <button class="sel-btn" id="btn-euclimini">odesEucliMini</button>
   </div>
 
-  <div class="guide">
+  <div class="flash-area">
+    <p>Conecta el dispositivo por USB, selecciona el firmware y haz clic en Instalar.<br>Requiere Chrome o Edge.</p>
+    <esp-web-install-button manifest="manifest_eucli.json"></esp-web-install-button>
+    <span class="version" id="fw-version">v2.0.1 — ESP32-S3</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- Guía odesEucli                               -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="guide" id="guide-eucli">
 
     <div>
       <h3>Play / Stop</h3>
@@ -114,18 +148,20 @@
       <h3>Canal activo</h3>
       <table><tbody>
         <tr><td>B3</td><td>Canal anterior</td></tr>
-        <tr><td>B4</td><td>Canal siguiente</td></tr>
+        <tr><td>Tocar sensor cap.</td><td>Ir al canal 0–11</td></tr>
       </tbody></table>
+      <p class="note">LED esquina (LED 19) = color del canal activo</p>
     </div>
 
     <div>
       <h3>Encoder</h3>
       <table><tbody>
-        <tr><td>Girar</td><td>K — cantidad de golpes</td></tr>
+        <tr><td>Girar</td><td>K — cantidad de golpes (eucli) / cursor de edición (lineal)</td></tr>
         <tr><td>SW + girar</td><td>Rotación del patrón</td></tr>
         <tr><td>B2 + girar</td><td>Cantidad de acentos</td></tr>
         <tr><td>B2 + SW + girar</td><td>Rotación de acentos</td></tr>
         <tr><td>B1 + girar</td><td>BPM ±1</td></tr>
+        <tr><td>B4 + girar</td><td>Escala de cuantización (canales melódicos)</td></tr>
       </tbody></table>
     </div>
 
@@ -135,13 +171,18 @@
         <tr><td>Pot4</td><td>Pitch (±18 semitonos)</td></tr>
         <tr><td>Pot5</td><td>Velocity del canal activo</td></tr>
         <tr><td>Pot6</td><td>Volumen master</td></tr>
-        <tr><td>B2 + Pot4</td><td>Intervalo del acento</td></tr>
+        <tr><td>Pot7</td><td>Filtro — cutoff LP (global)</td></tr>
+        <tr><td>Pot8</td><td>Filtro — resonancia (global)</td></tr>
+        <tr><td>B2 + Pot4</td><td>Intervalo del acento (en semitonos)</td></tr>
         <tr><td>B2 + Pot5</td><td>Paneo</td></tr>
+        <tr><td>B2 + Pot7 (canal mel.)</td><td>Decay / Color del timbre</td></tr>
+        <tr><td>B2 + Pot8 (canal mel.)</td><td>Armónico / Timbre secundario</td></tr>
       </tbody></table>
+      <p class="note">Todos los pots usan pickup: hay que moverlos para que tomen efecto.</p>
     </div>
 
     <div>
-      <h3>Modo lineal</h3>
+      <h3>Modo lineal — dibujar el patrón paso a paso</h3>
       <table><tbody>
         <tr><td>B2 + B3</td><td>Activa / desactiva modo lineal en el canal activo</td></tr>
         <tr><td>Girar encoder</td><td>Mueve el cursor por los 16 pasos</td></tr>
@@ -151,10 +192,40 @@
     </div>
 
     <div>
-      <h3>Otros</h3>
+      <h3>Sensores capacitivos (12 pads)</h3>
       <table><tbody>
-        <tr><td>B2 + B1</td><td>Activa / desactiva doble tempo (2x) en el canal activo</td></tr>
-        <tr><td>B1</td><td>Tap tempo</td></tr>
+        <tr><td>Tocar pad N</td><td>Ir al canal N (0–11)</td></tr>
+        <tr><td>B3 + tocar pad N</td><td>Mute / unmute del canal N</td></tr>
+        <tr><td>B4 + tocar pad N</td><td>Root de cuantización global (pad 0=C … 11=B)</td></tr>
+        <tr><td>B2 + tocar pad N</td><td>Timbre de los canales melódicos (pad 0–6)</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Canales melódicos (Mar1 / Mar2) — 7 timbres</h3>
+      <table class="timbre-row"><tbody>
+        <tr><td>0 — Marba</td><td>Marimba PCM 808</td></tr>
+        <tr><td>1 — Cuenco</td><td>Cuenco tibetano (SINE + armónico +18 st)</td></tr>
+        <tr><td>2 — Pluck</td><td>Pluck percutido (color = cutoff, timbre = res)</td></tr>
+        <tr><td>3 — Bajo</td><td>Bajo dub (SINE grave + LP)</td></tr>
+        <tr><td>4 — Brass</td><td>Brass (PULSE + LP)</td></tr>
+        <tr><td>5 — 8bit</td><td>Chiptune (PULSE, pot7=atk, pot8=rel)</td></tr>
+        <tr><td>6 — String</td><td>Cuerda (PULSE + ataque lento + LP)</td></tr>
+      </tbody></table>
+      <p class="note">OLED muestra BPM · Root · Escala · Timbre activo</p>
+    </div>
+
+    <div>
+      <h3>Doble tempo (2x)</h3>
+      <table><tbody>
+        <tr><td>B2 + B1</td><td>Activa / desactiva 2x en el canal activo</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Tap tempo</h3>
+      <table><tbody>
+        <tr><td>B1</td><td>Toca el ritmo — aplica después del 4.º tap</td></tr>
       </tbody></table>
     </div>
 
@@ -180,7 +251,104 @@
       </tbody></table>
     </div>
 
+    <div>
+      <h3>Salidas de clock y trigger</h3>
+      <table><tbody>
+        <tr><td>GPIO 35</td><td>Clock out — pulso por cada paso (16th)</td></tr>
+        <tr><td>GPIO 36</td><td>Trigger out — suma Kik + Cwbl</td></tr>
+        <tr><td>GPIO 35 / 36</td><td>Trig 1 / Trig 2 de los canales euclidíanos 9–10</td></tr>
+      </tbody></table>
+    </div>
+
   </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- Guía odesEucliMini                           -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="guide hidden" id="guide-euclimini">
+
+    <div>
+      <h3>Play / Stop</h3>
+      <table><tbody>
+        <tr><td>B5</td><td>Play / Stop</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Canal activo</h3>
+      <table><tbody>
+        <tr><td>B3</td><td>Canal anterior</td></tr>
+        <tr><td>B4</td><td>Canal siguiente</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Encoder</h3>
+      <table><tbody>
+        <tr><td>Girar</td><td>K — cantidad de golpes (eucli) / cursor (lineal)</td></tr>
+        <tr><td>SW + girar</td><td>Rotación del patrón</td></tr>
+        <tr><td>B2 + girar</td><td>Cantidad de acentos</td></tr>
+        <tr><td>B2 + SW + girar</td><td>Rotación de acentos</td></tr>
+        <tr><td>B1 + girar</td><td>BPM ±1</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Potenciómetros</h3>
+      <table><tbody>
+        <tr><td>Pot1</td><td>Pitch / (B2) Intervalo de acento</td></tr>
+        <tr><td>Pot2</td><td>Velocity / (B2) Paneo</td></tr>
+        <tr><td>Pot3</td><td>Volumen master</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Modo lineal</h3>
+      <table><tbody>
+        <tr><td>B2 + B3</td><td>Activa / desactiva modo lineal en el canal activo</td></tr>
+        <tr><td>Girar encoder</td><td>Mueve el cursor por los 16 pasos</td></tr>
+        <tr><td>SW press</td><td>Activa / desactiva el paso bajo el cursor</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Tap tempo</h3>
+      <table><tbody>
+        <tr><td>B1</td><td>Toca el ritmo — aplica después del 4.º tap</td></tr>
+      </tbody></table>
+    </div>
+
+    <div>
+      <h3>Presets</h3>
+      <table><tbody>
+        <tr><td>B6 press corto</td><td>Modo carga — encoder navega, SW carga</td></tr>
+        <tr><td>B6 hold 2s</td><td>Modo guardar — encoder elige slot, SW hold 2s guarda</td></tr>
+      </tbody></table>
+    </div>
+
+  </div>
+
+  <script>
+    const flashBtn  = document.querySelector('esp-web-install-button');
+    const versionEl = document.getElementById('fw-version');
+
+    const DATA = {
+      eucli:      { manifest: 'manifest_eucli.json',      version: 'v2.0.1 — ESP32-S3' },
+      euclimini:  { manifest: 'manifest_euclimini.json',  version: 'v1.0.0 — ESP32-S3' },
+    };
+
+    function select(which) {
+      document.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + which).classList.add('active');
+      document.querySelectorAll('.guide').forEach(g => g.classList.add('hidden'));
+      document.getElementById('guide-' + which).classList.remove('hidden');
+      flashBtn.setAttribute('manifest', DATA[which].manifest);
+      versionEl.textContent = DATA[which].version;
+    }
+
+    document.getElementById('btn-eucli').addEventListener('click',     () => select('eucli'));
+    document.getElementById('btn-euclimini').addEventListener('click', () => select('euclimini'));
+  </script>
 
 </body>
 </html>
