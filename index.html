@@ -329,7 +329,7 @@
   </div>
 
   <script>
-    const flashBtn  = document.querySelector('esp-web-install-button');
+    const flashArea = document.querySelector('.flash-area');
     const versionEl = document.getElementById('fw-version');
 
     const DATA = {
@@ -342,7 +342,13 @@
       document.getElementById('btn-' + which).classList.add('active');
       document.querySelectorAll('.guide').forEach(g => g.classList.add('hidden'));
       document.getElementById('guide-' + which).classList.remove('hidden');
-      flashBtn.setAttribute('manifest', DATA[which].manifest);
+
+      // esp-web-tools ignora setAttribute dinámico — hay que recrear el elemento
+      const old = flashArea.querySelector('esp-web-install-button');
+      const btn = document.createElement('esp-web-install-button');
+      btn.setAttribute('manifest', DATA[which].manifest);
+      flashArea.replaceChild(btn, old);
+
       versionEl.textContent = DATA[which].version;
     }
 
