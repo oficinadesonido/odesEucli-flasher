@@ -129,7 +129,7 @@
   <div class="flash-area">
     <p>Conecta el dispositivo por USB, selecciona el firmware y haz clic en Instalar.<br>Requiere Chrome o Edge.</p>
     <esp-web-install-button manifest="manifest_eucli.json"></esp-web-install-button>
-    <span class="version" id="fw-version">v2.1.0 — ESP32-S3</span>
+    <span class="version" id="fw-version">v2.2.0 — ESP32-S3</span>
   </div>
 
   <!-- ════════════════════════════════════════════ -->
@@ -140,21 +140,19 @@
     <div>
       <h3>Botones</h3>
       <table><tbody>
-        <tr><td>B1</td><td>Play / Stop</td></tr>
-        <tr><td>B2</td><td>Presets (cargar / guardar)</td></tr>
-        <tr><td>B3</td><td>Escalas / Root (con encoder o pad)</td></tr>
-        <tr><td>B4</td><td>Tap tempo / BPM fino (B4 + encoder)</td></tr>
-        <tr><td>B5</td><td>Canal anterior / Mute view (hold)</td></tr>
-        <tr><td>B6</td><td>Shift — modificador global</td></tr>
+        <tr><td><b>play</b> (B1)</td><td>Play / Stop</td></tr>
+        <tr><td><b>preset</b> (B2)</td><td>Cargar / guardar presets</td></tr>
+        <tr><td><b>escala</b> (B3)</td><td>Root y escala (con encoder o pad)</td></tr>
+        <tr><td><b>tempo</b> (B4)</td><td>Tap tempo / BPM fino (tempo + encoder)</td></tr>
+        <tr><td><b>mute</b> (B5)</td><td>Vista mute (hold) / toggle mute canal</td></tr>
+        <tr><td><b>shift</b> (B6)</td><td>Modificador global</td></tr>
       </tbody></table>
     </div>
 
     <div>
       <h3>Canal activo</h3>
       <table><tbody>
-        <tr><td>B5</td><td>Canal anterior</td></tr>
         <tr><td>Tocar sensor cap.</td><td>Ir al canal 0–11</td></tr>
-        <tr><td>B5 + tocar pad N</td><td>Mute / unmute del canal N</td></tr>
       </tbody></table>
       <p class="note">LED esquina (LED 19) = color del canal activo</p>
     </div>
@@ -164,10 +162,10 @@
       <table><tbody>
         <tr><td>Girar</td><td>K — cantidad de golpes (eucli) / cursor de edición (lineal)</td></tr>
         <tr><td>SW + girar</td><td>Rotación del patrón</td></tr>
-        <tr><td>B6 + girar</td><td>Cantidad de acentos</td></tr>
-        <tr><td>B6 + SW + girar</td><td>Rotación de acentos</td></tr>
-        <tr><td>B4 + girar</td><td>BPM ±1</td></tr>
-        <tr><td>B3 + girar</td><td>Escala de cuantización (canales melódicos)</td></tr>
+        <tr><td>shift + girar</td><td>Cantidad de acentos (Ka)</td></tr>
+        <tr><td>shift + SW + girar</td><td>Rotación de acentos (RotA)</td></tr>
+        <tr><td>tempo + girar</td><td>BPM ±1 (con aceleración)</td></tr>
+        <tr><td>escala + girar</td><td>Escala de cuantización (canales melódicos)</td></tr>
       </tbody></table>
     </div>
 
@@ -179,10 +177,10 @@
         <tr><td>Pot6</td><td>Volumen master</td></tr>
         <tr><td>Pot7</td><td>Filtro — cutoff LP (global)</td></tr>
         <tr><td>Pot8</td><td>Filtro — resonancia (global)</td></tr>
-        <tr><td>B6 + Pot4</td><td>Intervalo del acento (en semitonos)</td></tr>
-        <tr><td>B6 + Pot5</td><td>Paneo</td></tr>
-        <tr><td>B6 + Pot7 (canal mel.)</td><td>Decay / Color del timbre</td></tr>
-        <tr><td>B6 + Pot8 (canal mel.)</td><td>Armónico / Timbre secundario</td></tr>
+        <tr><td>shift + Pot4</td><td>Intervalo del acento (en semitonos)</td></tr>
+        <tr><td>shift + Pot5</td><td>Paneo</td></tr>
+        <tr><td>shift + Pot7 (mel.)</td><td>Decay / Color del timbre</td></tr>
+        <tr><td>shift + Pot8 (mel.)</td><td>Armónico / Timbre secundario</td></tr>
       </tbody></table>
       <p class="note">Todos los pots usan pickup: hay que moverlos para que tomen efecto.</p>
     </div>
@@ -190,7 +188,7 @@
     <div>
       <h3>Modo lineal — dibujar el patrón paso a paso</h3>
       <table><tbody>
-        <tr><td>B6 + B5</td><td>Activa / desactiva modo lineal en el canal activo</td></tr>
+        <tr><td>shift + mute</td><td>Activa / desactiva modo lineal en el canal activo</td></tr>
         <tr><td>Girar encoder</td><td>Mueve el cursor por los 16 pasos</td></tr>
         <tr><td>SW press</td><td>Activa / desactiva el paso bajo el cursor</td></tr>
       </tbody></table>
@@ -201,9 +199,9 @@
       <h3>Sensores capacitivos (12 pads)</h3>
       <table><tbody>
         <tr><td>Tocar pad N</td><td>Ir al canal N (0–11)</td></tr>
-        <tr><td>B5 + tocar pad N</td><td>Mute / unmute del canal N</td></tr>
-        <tr><td>B3 + tocar pad N</td><td>Root de cuantización global (pad 0=C … 11=B)</td></tr>
-        <tr><td>B6 + tocar pad N</td><td>Timbre de los canales melódicos (pad 0–6)</td></tr>
+        <tr><td>mute + tocar pad N</td><td>Mute / unmute del canal N</td></tr>
+        <tr><td>escala + tocar pad N</td><td>Root de cuantización global (pad 0=C … 11=B)</td></tr>
+        <tr><td>shift + tocar pad N</td><td>Timbre de los canales melódicos (pad 0–6)</td></tr>
       </tbody></table>
     </div>
 
@@ -222,21 +220,16 @@
     </div>
 
     <div>
-      <h3>Doble tempo (2x)</h3>
+      <h3>Tempo</h3>
       <table><tbody>
-        <tr><td>B6 + B4</td><td>Activa / desactiva 2x en el canal activo</td></tr>
+        <tr><td>tempo</td><td>Tap tempo — aplica después del 4.º tap</td></tr>
+        <tr><td>shift + tempo (batería)</td><td>Activa / desactiva 2x en el canal activo</td></tr>
+        <tr><td>shift + tempo (melódico)</td><td>Alterna 1x / 0.5x en el canal melódico activo</td></tr>
       </tbody></table>
     </div>
 
     <div>
-      <h3>Tap tempo</h3>
-      <table><tbody>
-        <tr><td>B4</td><td>Toca el ritmo — aplica después del 4.º tap</td></tr>
-      </tbody></table>
-    </div>
-
-    <div>
-      <h3>Presets — 48 en total</h3>
+      <h3>Presets — 64 en total</h3>
       <table><tbody>
         <tr>
           <td><span class="preset-dot" style="background:#2d8a2d"></span>Verde (0–15)</td>
@@ -248,19 +241,23 @@
         </tr>
         <tr>
           <td><span class="preset-dot" style="background:#1a4fa8"></span>Azul (32–47)</td>
-          <td>Usuario (guardados en memoria)</td>
+          <td>Usuario banco 1</td>
+        </tr>
+        <tr>
+          <td><span class="preset-dot" style="background:#7700cc"></span>Violeta (48–63)</td>
+          <td>Usuario banco 2</td>
         </tr>
       </tbody></table>
       <table style="margin-top:8px"><tbody>
-        <tr><td>B2 press corto</td><td>Entrar / salir modo carga — encoder navega, SW carga</td></tr>
-        <tr><td>B2 hold 2s</td><td>Modo guardar slots 32–47 — encoder elige, SW hold 2s guarda</td></tr>
+        <tr><td>preset press corto</td><td>Entrar / salir modo carga — encoder navega, SW carga</td></tr>
+        <tr><td>preset hold 2s</td><td>Modo guardar — encoder elige slot, SW hold 2s guarda</td></tr>
       </tbody></table>
     </div>
 
     <div>
-      <h3>Salidas de clock y trigger</h3>
+      <h3>Salidas trigger (Tr1 / Tr2)</h3>
       <table><tbody>
-        <tr><td>GPIO 8 / 9</td><td>Trig 1 / Trig 2 — canales euclidíanos 11–12</td></tr>
+        <tr><td>GPIO 8 / 9</td><td>Canales 11–12 — patrón euclidiano/lineal independiente</td></tr>
       </tbody></table>
     </div>
 
