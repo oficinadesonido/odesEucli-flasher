@@ -25,13 +25,16 @@
     <ol>
       <li>Conecta la placa azul al computador por <b>USB</b>.</li>
       <li>Usa <b>Chrome</b> o <b>Edge</b> de escritorio (Web Serial).</li>
-      <li>Pulsa <b>Instalar</b> y elige el puerto serie de la placa.</li>
+      <li><b>Mantén pulsado el botón BOOT</b> de la placa, pulsa <b>Instalar</b>,
+          elige el puerto y <b>sigue aguantando BOOT hasta que termine</b> la barra de progreso.</li>
     </ol>
     <p><esp-web-install-button manifest="./manifest.json">
       <button slot="activate">⬇ Instalar eucliMiniAzul</button>
       <span slot="unsupported">Tu navegador no soporta Web Serial — usa Chrome/Edge de escritorio.</span>
       <span slot="not-allowed">Se necesita HTTPS (o localhost) para acceder al puerto.</span>
     </esp-web-install-button></p>
+    <p class="warn">Si aparece <b>"Failed to initialize"</b>: es normal en esta placa. Repite
+    manteniendo <b>BOOT</b> apretado todo el rato (desde antes de pulsar Instalar hasta el final).</p>
   </div>
 
   <div class="card">
