@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eucliMiniAzul · Mis presets</title>
+<style>
+  body { font-family: 'Lato', system-ui, sans-serif; max-width: 620px; margin: 40px auto;
+         padding: 0 20px; color: #222; line-height: 1.5; }
+  h1 { color: #1565c0; margin-bottom: 2px; }
+  .sub { color: #777; margin-top: 0; }
+  .card { background: #f7f7f5; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  button { font: inherit; background: #1565c0; color: #fff; border: 0; border-radius: 8px;
+           padding: 10px 16px; cursor: pointer; margin: 4px 0; }
+  button.sec { background: #fff; color: #1565c0; border: 1.5px solid #1565c0; }
+  button:disabled { opacity: .45; cursor: default; }
+  a.btn { display: inline-block; text-decoration: none; }
+  input { font: inherit; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; width: 60%; }
+  #log { white-space: pre-wrap; font-family: 'DejaVu Sans Mono', monospace; font-size: 11px;
+         background: #111; color: #6f6; padding: 10px; border-radius: 8px; max-height: 180px;
+         overflow: auto; margin-top: 10px; }
+  .ok { color: #1565c0; font-weight: 600; }
+  .warn { background: #fff7e6; border-left: 4px solid #e0a800; padding: 8px 12px; font-size: .9em; }
+  ol { padding-left: 20px; } li { margin: 3px 0; }
+</style>
+</head>
+<body>
+  <h1>Mis presets · eucliMiniAzul</h1>
+  <p class="sub">Crea tus ritmos en la máquina y envíalos. No necesitas instalar nada.</p>
+
+  <div class="card">
+    <b>Cómo crear presets en la máquina:</b>
+    <ol>
+      <li>Arma tu ritmo (pads, encoder, pots…).</li>
+      <li>Mantén <b>preset (B2) 2 segundos</b> → modo guardar.</li>
+      <li>Gira el encoder para elegir un slot de usuario y mantén el <b>switch del encoder 2 s</b> para guardar.</li>
+      <li>Repite con los ritmos que quieras.</li>
+    </ol>
+    <a class="btn" href="./guia.pdf" target="_blank"><button class="sec">📖 Descargar guía (PDF)</button></a>
+  </div>
+
+  <div class="card">
+    <b>1.</b> Conecta la máquina por USB (Chrome/Edge) y pulsa:<br>
+    <button id="btnConnect">🔌 Conectar máquina</button>
+    <span id="connState"></span>
+  </div>
+
+  <div class="card">
+    <b>2.</b> Lee tus presets de la máquina:<br>
+    <button id="btnRead" disabled>📥 Leer mis presets</button>
+    <div id="log">— aún sin leer —</div>
+  </div>
+
+  <div class="card">
+    <b>3.</b> Envíamelos:<br>
+    <p>Tu nombre: <input id="nombre" placeholder="ej. Cami"></p>
+    <button id="btnSend" disabled>✉️ Enviar mis presets</button>
+    <button id="btnDownload" class="sec" disabled>💾 Descargar archivo (.txt)</button>
+    <p id="sendState"></p>
+  </div>
+
+  <div class="warn">
+    Usa <b>Chrome</b> o <b>Edge</b> de escritorio. Si "Enviar" no está configurado, usa
+    <b>Descargar archivo</b> y mándamelo por correo/WhatsApp.
+  </div>
+
+<script>
+  // ⚠️ Para activar el envío por correo: pega aquí tu access key de Web3Forms (web3forms.com).
+  const WEB3FORMS_KEY = "PEGAR_ACCESS_KEY_AQUI";
+
+  let port, dump = "";
+  const $ = id => document.getElementById(id);
+  const log = t => { $("log").textContent = t; };
+
+  $("btnConnect").onclick = async () => {
+    if (!("serial" in navigator)) { $("connState").textContent = " — navegador sin Web Serial"; return; }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 115200 });
+      $("connState").innerHTML = ' <span class="ok">conectada ✓</span>';
+      $("btnRead").disabled = false;
+    } catch (e) { $("connState").textContent = " — " + e.message; }
+  };
+
+  $("btnRead").onclick = async () => {
+    log("Leyendo…");
+    try {
+      const w = port.writable.getWriter();
+      await w.write(new TextEncoder().encode("D"));
+      w.releaseLock();
+      const r = port.readable.getReader();
+      const dec = new TextDecoder();
+      let txt = "";
+      const deadline = Date.now() + 6000;
+      while (Date.now() < deadline) {
+        const { value, done } = await Promise.race([
+          r.read(),
+          new Promise(res => setTimeout(() => res({ value: undefined, done: false }), 800))
+        ]);
+        if (done) break;
+        if (value) txt += dec.decode(value);
+        if (txt.includes("=== FIN DUMP ===")) break;
+      }
+      r.releaseLock();
+      const s = txt.indexOf("=== DUMP");
+      dump = s >= 0 ? txt.slice(s) : txt;
+      log(dump || "(sin datos — ¿guardaste presets?)");
+      const ok = dump.includes("FIN DUMP");
+      $("btnDownload").disabled = !ok;
+      $("btnSend").disabled = !ok;
+    } catch (e) { log("Error: " + e.message); }
+  };
+
+  function fileName() {
+    const n = ($("nombre").value || "musico").replace(/[^\w\-]/g, "_");
+    return `presets_${n}.txt`;
+  }
+
+  $("btnDownload").onclick = () => {
+    const blob = new Blob([dump], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName();
+    a.click();
+  };
+
+  $("btnSend").onclick = async () => {
+    if (WEB3FORMS_KEY.startsWith("PEGAR")) {
+      $("sendState").innerHTML = "Envío por correo no configurado todavía — usa <b>Descargar archivo</b>.";
+      return;
+    }
+    $("sendState").textContent = "Enviando…";
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: "Presets eucliMiniAzul — " + ($("nombre").value || "músico"),
+          nombre: $("nombre").value || "(sin nombre)",
+          presets: dump
+        })
+      });
+      const j = await res.json();
+      $("sendState").innerHTML = j.success
+        ? '<span class="ok">¡Enviado! Gracias ✓</span>'
+        : "Error al enviar — usa Descargar archivo.";
+    } catch (e) { $("sendState").textContent = "Error: " + e.message + " — usa Descargar archivo."; }
+  };
+</script>
+</body>
+</html>
