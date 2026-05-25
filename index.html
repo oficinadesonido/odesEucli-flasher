@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>odesEucliAzul · Web Flasher</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+  body { font-family: 'Lato', system-ui, sans-serif; max-width: 620px; margin: 40px auto;
+         padding: 0 20px; color: #222; line-height: 1.5; }
+  h1 { color: #b8002e; margin-bottom: 4px; }
+  .sub { color: #777; margin-top: 0; }
+  .card { background: #f7f7f5; border-radius: 10px; padding: 18px 22px; margin: 18px 0; }
+  ol { padding-left: 20px; } li { margin: 4px 0; }
+  esp-web-install-button { --esp-tools-button-color: #fff; --esp-tools-button-background-color: #b8002e; }
+  code { background: #eee; padding: 0 4px; border-radius: 3px; }
+  .warn { background: #fff7e6; border-left: 4px solid #e0a800; padding: 8px 12px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+  <h1>odesEucliAzul</h1>
+  <p class="sub">Secuenciador de batería euclidiana · firmware para placa azul (ESP32-S3)</p>
+
+  <div class="card">
+    <ol>
+      <li>Conecta la placa azul al computador por <b>USB</b>.</li>
+      <li>Usa <b>Chrome</b> o <b>Edge</b> de escritorio (Web Serial).</li>
+      <li>Pulsa <b>Instalar</b> y elige el puerto serie de la placa.</li>
+    </ol>
+    <p><esp-web-install-button manifest="./manifest.json">
+      <button slot="activate">⬇ Instalar odesEucliAzul</button>
+      <span slot="unsupported">Tu navegador no soporta Web Serial — usa Chrome/Edge de escritorio.</span>
+      <span slot="not-allowed">Se necesita HTTPS (o localhost) para acceder al puerto.</span>
+    </esp-web-install-button></p>
+  </div>
+
+  <div class="warn">
+    Esta página debe servirse por <b>HTTPS</b> o desde <code>localhost</code> (requisito de
+    Web Serial). Para probar localmente: <code>python3 -m http.server</code> en esta carpeta y
+    abrir <code>http://localhost:8000</code>. Para compartir, súbela a GitHub Pages u otro hosting HTTPS.
+  </div>
+
+  <p class="sub" style="font-size:0.85em">Firmware: ESP32-S3 · 16MB flash · PSRAM habilitada · 4 partes
+  (bootloader 0x0, particiones 0x8000, boot_app0 0xE000, app 0x10000).</p>
+</body>
+</html>
