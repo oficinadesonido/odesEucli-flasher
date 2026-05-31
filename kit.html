@@ -35,7 +35,8 @@
 
   <div class="warn">
     Usa <b>Chrome</b> o <b>Edge</b> de escritorio. <b>Detén el secuenciador</b> (Play en OFF)
-    antes de enviar. Los samples se pierden al apagar (es para audicionar). Cada sample es
+    antes de enviar. Primero <b>audicionás</b> el kit (paso 3, se pierde al apagar); si te gusta,
+    lo <b>guardás en un slot de usuario</b> (paso 4) y queda <b>aunque apagues</b>. Cada sample es
     one-shot, ideal &lt; 2 s. Se convierten a mono 44.1&nbsp;kHz automáticamente.
   </div>
 
@@ -52,9 +53,22 @@
   </div>
 
   <div class="card">
-    <b>3.</b> Envíalos:<br>
-    <button id="btnSend" disabled>⬆️ Enviar kit a la máquina</button>
+    <b>3.</b> Audiciónalos (van a memoria temporal, se pierden al apagar):<br>
+    <button id="btnSend" disabled>⬆️ Enviar kit a la máquina (audición)</button>
     <button id="btnReset" class="sec" disabled>↩️ Volver al kit 808</button>
+  </div>
+
+  <div class="card">
+    <b>4.</b> Si te gusta, <b>guárdalo</b> en un slot de usuario (queda al apagar):<br>
+    <button class="sec slotSave" data-slot="0" disabled>💾 Slot 1</button>
+    <button class="sec slotSave" data-slot="1" disabled>💾 Slot 2</button>
+    <button class="sec slotSave" data-slot="2" disabled>💾 Slot 3</button>
+    <button class="sec slotSave" data-slot="3" disabled>💾 Slot 4</button>
+    <p class="sub" style="font-size:.85em;margin:6px 0 0">En la máquina, elige el kit con
+      <b>shift + preset</b> (los 4 LED morados del anillo son tus slots).</p>
+  </div>
+
+  <div class="card">
     <div id="log">— sin conectar —</div>
   </div>
 
@@ -147,6 +161,7 @@
       $("btnSend").disabled = false;
       $("btnReset").disabled = false;
       $("btnPing").disabled = false;
+      document.querySelectorAll(".slotSave").forEach(b => b.disabled = false);
       logLine("Pulsa 📡 Ping para probar la respuesta de la placa.");
     } catch (e) { $("connState").textContent = " — " + e.message; }
   };
@@ -233,6 +248,23 @@
       for (let i = 0; i < 8; i++) setSt(i, "");
     } catch (e) { logLine("Error reset: " + e.message); }
   };
+
+  // ── Guardar el kit audicionado (en PSRAM) a un slot de usuario ('S') ──
+  async function saveToSlot(u) {
+    try {
+      logLine("» S slot=" + (u + 1));
+      await writer.write(new Uint8Array([ "S".charCodeAt(0), u ]));
+      const line = await expect(["DONE"], 8000);   // borra+escribe flash: puede tardar
+      if (line.startsWith("ERR")) {
+        logLine("⚠ No se guardó (" + line + "). ¿Audicionaste un kit antes (paso 3)?");
+      } else {
+        logLine("✓ Guardado en slot " + (u + 1) + " (queda al apagar).");
+      }
+    } catch (e) { logLine("Error guardando: " + e.message); }
+  }
+  document.querySelectorAll(".slotSave").forEach(b => {
+    b.onclick = () => saveToSlot(parseInt(b.dataset.slot, 10));
+  });
 </script>
 </body>
 </html>
