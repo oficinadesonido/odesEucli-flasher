@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eucliMini · Web Flasher</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+  body { font-family: 'Lato', system-ui, sans-serif; max-width: 620px; margin: 40px auto;
+         padding: 0 20px; color: #222; line-height: 1.5; }
+  h1 { color: #c62828; margin-bottom: 4px; }
+  .sub { color: #777; margin-top: 0; }
+  .card { background: #f7f7f5; border-radius: 10px; padding: 18px 22px; margin: 18px 0; }
+  ol { padding-left: 20px; } li { margin: 4px 0; }
+  esp-web-install-button { --esp-tools-button-color: #fff; --esp-tools-button-background-color: #c62828; }
+  code { background: #eee; padding: 0 4px; border-radius: 3px; }
+  .warn { background: #fff7e6; border-left: 4px solid #e0a800; padding: 8px 12px; font-size: 0.92em; }
+  button { font: inherit; background: #c62828; color: #fff; border: 0; border-radius: 8px;
+           padding: 10px 16px; cursor: pointer; margin: 4px 0; }
+</style>
+</head>
+<body>
+  <h1>eucliMini</h1>
+  <p class="sub">Secuenciador de batería euclidiana · firmware para la placa roja v3 (ESP32-S3)</p>
+
+  <div class="card">
+    <ol>
+      <li>Conecta el eucliMini al computador por el USB-C <b>J1</b> (el USB de datos;
+          <b>J3 solo alimenta</b>, por ahí no se flashea).</li>
+      <li>Si había un aparato MIDI enchufado en J1, <b>desconéctalo</b> primero.</li>
+      <li>Usa <b>Chrome</b> o <b>Edge</b> de escritorio (Web Serial).</li>
+      <li><b>Placa nueva</b> (recién ensamblada, sin firmware): pulsa <b>Instalar</b>, elige el
+          puerto y listo — no hay que tocar ningún botón.</li>
+      <li><b>Placa que ya tiene firmware</b>: mantén <b>shift + play</b> apretados mientras
+          conectas el USB (o mientras reseteas). La placa entra en modo descarga; suéltalos
+          y pulsa <b>Instalar</b>.</li>
+    </ol>
+    <p><esp-web-install-button manifest="./manifest.json">
+      <button slot="activate">⬇ Instalar eucliMini v3</button>
+      <span slot="unsupported">Tu navegador no soporta Web Serial — usa Chrome/Edge de escritorio.</span>
+      <span slot="not-allowed">Se necesita HTTPS (o localhost) para acceder al puerto.</span>
+    </esp-web-install-button></p>
+    <p class="warn">¿No aparece el puerto o da <b>"Failed to initialize"</b>? Desenchufa el USB,
+    vuelve a enchufarlo <b>manteniendo shift + play</b>, y reintenta. El puerto correcto se
+    identifica como <code>USB JTAG/serial debug unit</code>.</p>
+  </div>
+
+  <div class="card">
+    <p>Ya con el firmware instalado (conectado por J1, sin aparato MIDI):</p>
+    <p><a href="./kit.html"><button>🥁 Subir kit (audicionar y guardar)</button></a>
+       <a href="./presets.html"><button style="background:#fff;color:#c62828;border:1.5px solid #c62828">🎛 Presets</button></a></p>
+    <p class="sub" style="font-size:.88em"><b>8 kits de batería</b> (4 de fábrica + 4 tuyos, elige con
+    <b>shift + preset</b>); subí y <b>guardá tus kits</b> (quedan al apagar) desde "Subir kit".
+    Para usar la placa como <b>host MIDI</b> (teclado/pad en J1): alimenta por J3 y conecta el
+    aparato en J1.</p>
+  </div>
+
+  <p class="sub" style="font-size:.85em"><a href="../">← flasher de la placa azul (eucliMiniAzul)</a></p>
+
+  <p class="sub" style="font-size:0.85em">Firmware: ESP32-S3 · 16MB flash · PSRAM habilitada · 4 partes
+  (bootloader 0x0, particiones 0x8000, boot_app0 0xE000, app 0x10000).</p>
+</body>
+</html>
