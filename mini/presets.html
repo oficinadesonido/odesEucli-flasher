@@ -1,151 +1,245 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>eucliMini · Mis presets</title>
-<style>
-  body { font-family: 'Lato', system-ui, sans-serif; max-width: 620px; margin: 40px auto;
-         padding: 0 20px; color: #222; line-height: 1.5; }
-  h1 { color: #1565c0; margin-bottom: 2px; }
-  .sub { color: #777; margin-top: 0; }
-  .card { background: #f7f7f5; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
-  button { font: inherit; background: #1565c0; color: #fff; border: 0; border-radius: 8px;
-           padding: 10px 16px; cursor: pointer; margin: 4px 0; }
-  button.sec { background: #fff; color: #1565c0; border: 1.5px solid #1565c0; }
-  button:disabled { opacity: .45; cursor: default; }
-  a.btn { display: inline-block; text-decoration: none; }
-  input { font: inherit; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; width: 60%; }
-  #log { white-space: pre-wrap; font-family: 'DejaVu Sans Mono', monospace; font-size: 11px;
-         background: #111; color: #6f6; padding: 10px; border-radius: 8px; max-height: 180px;
-         overflow: auto; margin-top: 10px; }
-  .ok { color: #1565c0; font-weight: 600; }
-  .warn { background: #fff7e6; border-left: 4px solid #e0a800; padding: 8px 12px; font-size: .9em; }
-  ol { padding-left: 20px; } li { margin: 3px 0; }
-</style>
+<title>CLAVE · Backup presets</title>
+<link rel="stylesheet" href="./clave.css">
 </head>
 <body>
-  <h1>Mis presets · eucliMini</h1>
-  <p class="sub">Crea tus ritmos en la máquina y envíalos. No necesitas instalar nada.</p>
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+  <header class="site-header">
+    <a class="logo" href="./index.html"><img src="./assets/clave-logo.svg" alt="CLAVE — home"></a>
+    <nav class="site-nav" aria-label="CLAVE web tools">
+      <ul>
+        <li><a href="./index.html">Firmware (3.0)</a></li>
+        <li><a href="./kit.html">Upload Sound Kits</a></li>
+        <li><a href="./presets.html" aria-current="page">Backup presets</a></li>
+      </ul>
+    </nav>
+    <div class="header-aside">
+      <img class="badges" src="./assets/badges.svg" alt="ODES, oficinadesonido.org · Creative Commons · Open Source Hardware · WEEE">
+      <p class="intro">Use the desktop version of Chrome, Edge or Brave. Nothing to install. Back up
+      the presets you saved on CLAVE to a file on your computer, and load them back into CLAVE whenever
+      you want. Stop the sequencer (Play off) before loading.</p>
+    </div>
+  </header>
 
-  <div class="card">
-    <b>Cómo crear presets en la máquina:</b>
-    <ol>
-      <li>Arma tu ritmo (pads, encoder, pots…).</li>
-      <li>Mantén <b>preset (B2) 2 segundos</b> → modo guardar.</li>
-      <li>Gira el encoder para elegir un slot de usuario y mantén el <b>switch del encoder 2 s</b> para guardar.</li>
-      <li>Repite con los ritmos que quieras.</li>
-    </ol>
-    <a class="btn" href="./guia.pdf" target="_blank"><button class="sec">📖 Descargar guía (PDF)</button></a>
-  </div>
+  <main id="main">
+    <h1>Backup presets</h1>
 
-  <div class="card">
-    <b>1.</b> Conecta la máquina por USB (Chrome, Edge o Brave) y pulsa:<br>
-    <button id="btnConnect">🔌 Conectar máquina</button>
-    <span id="connState"></span>
-  </div>
+    <div class="steps">
+      <section class="step">
+        <h2 class="step-title"><span class="num">0</span>
+          <span class="txt">Save your rhythms as presets on CLAVE.</span></h2>
+        <ul>
+          <li>Build your rhythm (pads, encoder, knobs).</li>
+          <li>Hold preset (B2) for 2 seconds to enter save mode.</li>
+          <li>Turn the encoder to choose a user slot, then hold the encoder switch for 2 seconds to save.</li>
+          <li>Repeat with every rhythm you want to keep.</li>
+        </ul>
+        <p><a href="./ManualEucliMini.pdf" target="_blank" rel="noopener">User manual (PDF, opens in a new tab)</a></p>
+      </section>
 
-  <div class="card">
-    <b>2.</b> Lee tus presets de la máquina:<br>
-    <button id="btnRead" disabled>📥 Leer mis presets</button>
-    <div id="log">— aún sin leer —</div>
-  </div>
+      <section class="step">
+        <h2 class="step-title"><span class="num">1</span>
+          <span class="txt">Connect CLAVE through USB-C J1 and press connect usb.</span></h2>
+        <div class="actions">
+          <button class="btn" id="btnConnect">connect usb</button>
+        </div>
+        <p class="status" id="connState" aria-live="polite">Not connected.</p>
+      </section>
 
-  <div class="card">
-    <b>3.</b> Envíamelos:<br>
-    <p>Tu nombre: <input id="nombre" placeholder="ej. Cami"></p>
-    <button id="btnSend" disabled>✉️ Enviar mis presets</button>
-    <button id="btnDownload" class="sec" disabled>💾 Descargar archivo (.txt)</button>
-    <p id="sendState"></p>
-  </div>
+      <section class="step">
+        <h2 class="step-title"><span class="num">2</span>
+          <span class="txt">Back up: read the presets stored on CLAVE and save them to a file.</span></h2>
+        <div class="field">
+          <label for="nombre">Your name (for the file name)</label>
+          <input type="text" id="nombre" placeholder="e.g. jko" autocomplete="name">
+        </div>
+        <div class="actions">
+          <button class="btn" id="btnRead" disabled aria-describedby="connState">read presets</button>
+          <button class="btn sec" id="btnDownload" disabled aria-describedby="readState">download .txt</button>
+        </div>
+        <p class="status" id="readState" aria-live="polite"></p>
+      </section>
 
-  <div class="warn">
-    Usa <b>Chrome</b>, <b>Edge</b> o <b>Brave</b> de escritorio. Si "Enviar" no está configurado, usa
-    <b>Descargar archivo</b> y mándamelo por correo/WhatsApp.
-  </div>
+      <section class="step">
+        <h2 class="step-title"><span class="num">3</span>
+          <span class="txt">Load presets into CLAVE from a backup file.</span></h2>
+        <p>Each preset goes back to the same user slot it came from, and replaces what is in that slot
+        now. Slots that are not in the file stay as they are.</p>
+        <div class="actions">
+          <button class="btn sec" id="btnChoose" type="button" aria-describedby="fileName">choose backup file</button>
+          <button class="btn" id="btnLoad" disabled aria-describedby="loadState">load into CLAVE</button>
+        </div>
+        <p class="note small" id="fileName">No file chosen</p>
+        <input type="file" id="fileIn" accept=".txt,text/plain" hidden>
+        <p class="status" id="loadState" aria-live="polite"></p>
+      </section>
+    </div>
+
+    <section class="panel console" id="log" role="log" aria-live="off" aria-label="Presets read from CLAVE" tabindex="0">Nothing read yet.</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Backups made with this page need CLAVE firmware with preset backup support (newer than 3.0).</p>
+  </footer>
+</div>
 
 <script>
-  // ⚠️ Para activar el envío por correo: pega aquí tu access key de Web3Forms (web3forms.com).
-  const WEB3FORMS_KEY = "44a11cbe-2763-41ed-8888-5f6dfd363918";
-
-  let port, dump = "";
   const $ = id => document.getElementById(id);
+  const state = (id, t, cls) => { $(id).textContent = t; $(id).className = "status " + (cls || ""); };
   const log = t => { $("log").textContent = t; };
+  const USER_FIRST = 32, USER_LAST = 63;           // firmware PRESET_USER .. PRESET_LATIN-1
+  const slotName = i => (i < 48 ? "blue" : "purple") + " bank, slot " + ((i - USER_FIRST) % 16 + 1);
+
+  // ── Web Serial: line reader ──────────────────────────────────
+  let port, reader, writer, rxBuf = "", backup = null, restore = null;
+  const lineQueue = [], lineWaiters = [];
+  function feed(text) {
+    rxBuf += text;
+    let k;
+    while ((k = rxBuf.indexOf("\n")) >= 0) {
+      const line = rxBuf.slice(0, k).replace(/\r$/, "");
+      rxBuf = rxBuf.slice(k + 1);
+      if (lineWaiters.length) lineWaiters.shift()(line); else lineQueue.push(line);
+    }
+  }
+  function nextLine(ms) {
+    if (lineQueue.length) return Promise.resolve(lineQueue.shift());
+    return new Promise((resolve, reject) => {
+      const res = l => { clearTimeout(t); resolve(l); };
+      const t = setTimeout(() => { const i = lineWaiters.indexOf(res); if (i >= 0) lineWaiters.splice(i, 1); reject(new Error("timeout")); }, ms);
+      lineWaiters.push(res);
+    });
+  }
+  async function waitFor(test, ms) {                 // first line where test(line) is true
+    const end = Date.now() + ms;
+    while (Date.now() < end) { const l = await nextLine(Math.max(50, end - Date.now())); if (test(l)) return l; }
+    throw new Error("timeout");
+  }
+  async function readLoop() {
+    const dec = new TextDecoder();
+    try { while (true) { const { value, done } = await reader.read(); if (done) break; if (value) feed(dec.decode(value)); } }
+    catch (e) { state("connState", "Connection lost: " + e.message, "err"); }
+  }
+  function writeT(data, ms = 5000) {
+    let t;
+    return Promise.race([writer.write(typeof data === "string" ? new TextEncoder().encode(data) : data),
+      new Promise((_, rej) => { t = setTimeout(() => rej(new Error("write timeout")), ms); })]).finally(() => clearTimeout(t));
+  }
 
   $("btnConnect").onclick = async () => {
-    if (!("serial" in navigator)) { $("connState").textContent = " — navegador sin Web Serial"; return; }
+    if (!("serial" in navigator)) { state("connState", "This browser doesn't support Web Serial. Use Chrome, Edge or Brave.", "err"); return; }
     try {
       port = await navigator.serial.requestPort();
       await port.open({ baudRate: 115200 });
-      $("connState").innerHTML = ' <span class="ok">conectada ✓</span>';
+      reader = port.readable.getReader(); writer = port.writable.getWriter(); readLoop();
+      state("connState", "Connected ✓", "ok");
       $("btnRead").disabled = false;
-    } catch (e) { $("connState").textContent = " — " + e.message; }
+      $("btnLoad").disabled = !restore;
+    } catch (e) {
+      const busy = /Failed to open/.test(e.message);
+      state("connState", busy ? "CLAVE is already open in another tab or window. Close it and try again."
+                              : "Not connected: " + e.message, "err");
+    }
   };
 
+  // ── Back up ('B') ────────────────────────────────────────────
   $("btnRead").onclick = async () => {
-    log("Leyendo…");
+    state("readState", "Reading…"); log("Reading…");
+    lineQueue.length = 0;
     try {
-      const w = port.writable.getWriter();
-      await w.write(new TextEncoder().encode("D"));
-      w.releaseLock();
-      const r = port.readable.getReader();
-      const dec = new TextDecoder();
-      let txt = "";
-      const deadline = Date.now() + 6000;
-      while (Date.now() < deadline) {
-        const { value, done } = await Promise.race([
-          r.read(),
-          new Promise(res => setTimeout(() => res({ value: undefined, done: false }), 800))
-        ]);
-        if (done) break;
-        if (value) txt += dec.decode(value);
-        if (txt.includes("=== FIN DUMP ===")) break;
+      await writeT("B");
+      const head = await waitFor(l => l.startsWith("=== BACKUP"), 3000).catch(() => null);
+      if (!head) {
+        state("readState", "This CLAVE firmware can't back up presets yet. Update the firmware first.", "err");
+        log("No answer to the backup command."); return;
       }
-      r.releaseLock();
-      const s = txt.indexOf("=== DUMP");
-      dump = s >= 0 ? txt.slice(s) : txt;
-      log(dump || "(sin datos — ¿guardaste presets?)");
-      const ok = dump.includes("FIN DUMP");
-      $("btnDownload").disabled = !ok;
-      $("btnSend").disabled = !ok;
-    } catch (e) { log("Error: " + e.message); }
+      const presets = [];
+      while (true) {
+        const l = await waitFor(() => true, 3000);
+        if (l.startsWith("=== END BACKUP")) break;
+        const m = l.match(/^P (\d+) ([0-9A-F]+)$/);
+        if (m) presets.push({ idx: +m[1], hex: m[2] });
+      }
+      backup = { head, presets };
+      $("btnDownload").disabled = !presets.length;
+      if (presets.length) {
+        state("readState", `✓ ${presets.length} presets read. Download the file to keep them.`, "ok");
+        log(head + "\n\n" + presets.map(p => "✓ " + slotName(p.idx)).join("\n"));
+      } else {
+        state("readState", "No presets saved on CLAVE.", "err"); log("No user presets.");
+      }
+    } catch (e) { state("readState", "Error: " + e.message, "err"); }
   };
 
+  // preset_<name>_<YYYY-MM-DD>.txt  (e.g. preset_jko_2026-09-17.txt)
   function fileName() {
-    const n = ($("nombre").value || "musico").replace(/[^\w\-]/g, "_");
-    return `presets_${n}.txt`;
+    const n = ($("nombre").value.trim() || "clave").replace(/[^\w\-]+/g, "_");
+    const d = new Date();
+    const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return `preset_${n}_${date}.txt`;
   }
-
   $("btnDownload").onclick = () => {
-    const blob = new Blob([dump], { type: "text/plain" });
+    const txt = ["# CLAVE preset backup — load it with the Backup presets page", "# " + new Date().toISOString(),
+      backup.head, ...backup.presets.map(p => `P ${p.idx} ${p.hex}`), "=== END BACKUP ===", ""].join("\n");
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = fileName();
-    a.click();
+    a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain" }));
+    a.download = fileName(); a.click();
+    state("readState", "✓ Downloaded " + fileName() + ".", "ok");
   };
 
-  $("btnSend").onclick = async () => {
-    if (WEB3FORMS_KEY.startsWith("PEGAR")) {
-      $("sendState").innerHTML = "Envío por correo no configurado todavía — usa <b>Descargar archivo</b>.";
+  // ── Load into CLAVE ('R') ────────────────────────────────────
+  $("btnChoose").onclick = () => $("fileIn").click();
+  $("fileIn").onchange = async e => {
+    const f = e.target.files[0]; restore = null; $("btnLoad").disabled = true; state("loadState", "");
+    if (!f) { $("fileName").textContent = "No file chosen"; return; }
+    const txt = await f.text();
+    const presets = [...txt.matchAll(/^P (\d+) ([0-9A-Fa-f]+)\s*$/gm)]
+      .map(m => ({ idx: +m[1], hex: m[2] })).filter(p => p.idx >= USER_FIRST && p.idx <= USER_LAST);
+    $("fileName").textContent = f.name;
+    if (!presets.length) {
+      const old = txt.includes("=== DUMP USER PRESETS");
+      state("loadState", old ? "This file is an old preset list (firmware 3.0). It can't be loaded back into CLAVE."
+                             : "No presets found in this file.", "err");
       return;
     }
-    $("sendState").textContent = "Enviando…";
+    restore = presets;
+    $("fileName").textContent = `${f.name} · ${presets.length} presets`;
+    log("In the file:\n" + presets.map(p => "• " + slotName(p.idx)).join("\n"));
+    $("btnLoad").disabled = !writer;
+    state("loadState", writer ? "Ready. Stop the sequencer, then press load into CLAVE."
+                              : "Connect CLAVE (step 1) to load it.");
+  };
+
+  $("btnLoad").onclick = async () => {
+    if (!restore) return;
+    $("btnLoad").disabled = true;
+    lineQueue.length = 0;
+    const done = [];
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: "Presets eucliMini — " + ($("nombre").value || "músico"),
-          nombre: $("nombre").value || "(sin nombre)",
-          presets: dump
-        })
-      });
-      const j = await res.json();
-      $("sendState").innerHTML = j.success
-        ? '<span class="ok">¡Enviado! Gracias ✓</span>'
-        : "Error al enviar — usa Descargar archivo.";
-    } catch (e) { $("sendState").textContent = "Error: " + e.message + " — usa Descargar archivo."; }
+      for (let i = 0; i < restore.length; i++) {
+        const p = restore[i];
+        state("loadState", `Loading ${i + 1} of ${restore.length}: ${slotName(p.idx)}…`);
+        await writeT(`R${p.idx} ${p.hex}\n`);
+        const l = await waitFor(x => x.startsWith("DONE restore") || x.startsWith("ERR"), 4000);
+        if (l.startsWith("ERR")) {
+          throw new Error(l.includes("playing") ? "CLAVE is playing. Stop the sequencer and try again."
+                        : l.includes("size") ? "This backup comes from a different firmware version and can't be loaded."
+                        : l);
+        }
+        done.push("✓ " + slotName(p.idx));
+        log(done.join("\n"));
+      }
+      state("loadState", `✓ ${restore.length} presets loaded into CLAVE.`, "ok");
+    } catch (e) {
+      state("loadState", `✗ Stopped after ${done.length} of ${restore.length}: ` +
+        (e.message === "timeout" ? "CLAVE didn't answer. Update the firmware or check the cable." : e.message), "err");
+    }
+    $("btnLoad").disabled = false;
   };
 </script>
 </body>
