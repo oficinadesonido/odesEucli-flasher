@@ -232,6 +232,14 @@
     return m;
   }
 
+  // USB feedback on CLAVE's ring: 'C' says "web connected" (slow orange pulse while stopped).
+  // Sent on connect and every 2 s, but never in the middle of a transfer.
+  let busy = false;
+  function startHeartbeat() {
+    const beat = () => { if (!busy && writer) writeT("C").catch(() => {}); };
+    beat(); setInterval(beat, 2000);
+  }
+
   $("btnConnect").onclick = async () => {
     if (!("serial" in navigator)) {
       $("connState").textContent = "This browser doesn't support Web Serial. Use Chrome, Edge or Brave.";
@@ -247,6 +255,7 @@
       readLoop();
       $("connState").textContent = "Connected ✓";
       $("connState").className = "status ok";
+      startHeartbeat();
       $("btnSend").disabled = false;
       $("btnReset").disabled = false;
       $("btnPing").disabled = false;
@@ -331,9 +340,16 @@
       logLine(m); sendState("✗ " + m, "err"); return;
     }
     sending = true; sentSamples = 0; updateBudget();
+    busy = true;
     sendState("Sending the kit…");
     $("btnSend").disabled = true; $("btnReset").disabled = true;
     for (const [i] of chosen) setSt(i, "waiting…");
+    // progress bar on CLAVE's ring: total bytes of the kit (older firmware ignores it)
+    try {
+      busy = true;
+      await writeT(`L${total * 2}\n`);
+      await expect(["DONE load"], 1500).catch(() => null);
+    } catch (e) { /* not critical */ }
     say("Sending " + chosen.length + " samples…");
     let current = -1;
     try {
@@ -355,7 +371,7 @@
       logLine("Error: " + e.message);
       sendState("✗ Channel " + (current + 1) + ": " + msg, "err");
     }
-    sending = false; updateBudget();
+    sending = false; busy = false; updateBudget();
     $("btnSend").disabled = false; $("btnReset").disabled = false;
   };
 

@@ -131,6 +131,14 @@
       new Promise((_, rej) => { t = setTimeout(() => rej(new Error("write timeout")), ms); })]).finally(() => clearTimeout(t));
   }
 
+  // USB feedback on CLAVE's ring: 'C' says "web connected" (slow orange pulse while stopped).
+  // Sent on connect and every 2 s, but never in the middle of a transfer.
+  let busy = false;
+  function startHeartbeat() {
+    const beat = () => { if (!busy && writer) writeT("C").catch(() => {}); };
+    beat(); setInterval(beat, 2000);
+  }
+
   $("btnConnect").onclick = async () => {
     if (!("serial" in navigator)) { state("connState", "This browser doesn't support Web Serial. Use Chrome, Edge or Brave.", "err"); return; }
     try {
@@ -138,6 +146,7 @@
       await port.open({ baudRate: 115200 });
       reader = port.readable.getReader(); writer = port.writable.getWriter(); readLoop();
       state("connState", "Connected ✓", "ok");
+      startHeartbeat();
       $("btnRead").disabled = false;
       $("btnLoad").disabled = !restore;
     } catch (e) {
@@ -150,6 +159,7 @@
   // ── Back up ('B') ────────────────────────────────────────────
   $("btnRead").onclick = async () => {
     state("readState", "Reading…"); log("Reading…");
+    busy = true;
     lineQueue.length = 0;
     try {
       await writeT("B");
@@ -174,6 +184,7 @@
         state("readState", "No presets saved on CLAVE.", "err"); log("No user presets.");
       }
     } catch (e) { state("readState", "Error: " + e.message, "err"); }
+    finally { busy = false; }
   };
 
   // preset_<name>_<YYYY-MM-DD>.txt  (e.g. preset_jko_2026-09-17.txt)
@@ -218,9 +229,13 @@
   $("btnLoad").onclick = async () => {
     if (!restore) return;
     $("btnLoad").disabled = true;
+    busy = true;
     lineQueue.length = 0;
     const done = [];
     try {
+      // progress bar on CLAVE's ring (older firmware just ignores it)
+      await writeT(`L${restore.length}\n`);
+      await waitFor(x => x.startsWith("DONE load") || x.startsWith("ERR"), 1500).catch(() => null);
       for (let i = 0; i < restore.length; i++) {
         const p = restore[i];
         state("loadState", `Loading ${i + 1} of ${restore.length}: ${slotName(p.idx)}…`);
@@ -250,6 +265,7 @@
       state("loadState", `✗ Stopped after ${done.length} of ${restore.length}: ` +
         (e.message === "timeout" ? "CLAVE didn't answer. Update the firmware or check the cable." : e.message), "err");
     }
+    busy = false;
     $("btnLoad").disabled = false;
   };
 </script>
