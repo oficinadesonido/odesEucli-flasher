@@ -224,12 +224,23 @@
       for (let i = 0; i < restore.length; i++) {
         const p = restore[i];
         state("loadState", `Loading ${i + 1} of ${restore.length}: ${slotName(p.idx)}…`);
-        await writeT(`R${p.idx} ${p.hex}\n`);
-        const l = await waitFor(x => x.startsWith("DONE restore") || x.startsWith("ERR"), 4000);
+        // A preset line is ~1,500 characters; if part of it gets lost on the way
+        // (CDC RX overflow on older firmware), CLAVE answers ERR restore size/format.
+        // Retry that preset up to 2 more times before giving up.
+        let l = "";
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          lineQueue.length = 0;
+          await writeT(`R${p.idx} ${p.hex}\n`);
+          l = await waitFor(x => x.startsWith("DONE restore") || x.startsWith("ERR"), 4000).catch(() => "ERR timeout");
+          const transfer = /ERR (restore (size|format|timeout)|timeout)/.test(l);
+          if (!transfer) break;
+          if (attempt < 3) state("loadState", `Loading ${i + 1} of ${restore.length}: ${slotName(p.idx)} (retry ${attempt})…`);
+        }
         if (l.startsWith("ERR")) {
           throw new Error(l.includes("playing") ? "CLAVE is playing. Stop the sequencer and try again."
-                        : l.includes("size") ? "This backup comes from a different firmware version and can't be loaded."
-                        : l);
+                        : l.includes("slot") ? "This preset belongs to a slot CLAVE doesn't have."
+                        : l.includes("timeout") ? "CLAVE didn't answer. Update the firmware or check the cable."
+                        : "The preset didn't arrive complete after 3 tries. Update CLAVE's firmware and try again.");
         }
         done.push("✓ " + slotName(p.idx));
         log(done.join("\n"));
