@@ -296,6 +296,7 @@
   // Writes can wait forever if CLAVE stops reading (USB buffer full): give up after ms.
   function writeT(data, ms = 5000) {
     let t;
+    if (typeof data === "string") data = new TextEncoder().encode(data);   // "C", "L…" → bytes
     return Promise.race([
       writer.write(data),
       new Promise((_, rej) => { t = setTimeout(() => rej(new Error("write timeout")), ms); })
