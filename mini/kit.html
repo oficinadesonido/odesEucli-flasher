@@ -179,7 +179,10 @@
     while ((idx = rxBuf.indexOf("\n")) >= 0) {
       const line = rxBuf.slice(0, idx).replace(/\r$/, "");
       rxBuf = rxBuf.slice(idx + 1);
-      if (line !== "ACK") logLine("« " + line);   // ACK hidden (one per chunk)
+      // Hide ACKs (one per chunk) and CLAVE's periodic debug lines ([prof], [hb], MPRS…).
+      const noise = line === "ACK" || /^(\[(prof|hb|clkdiag|pm|wd|clk)\]|MPRS |MPR121 )/.test(line)
+                    || /^\s*$/.test(line);
+      if (!noise) logLine("« " + line);
       if (lineWaiters.length) lineWaiters.shift()(line);
       else lineQueue.push(line);
     }
