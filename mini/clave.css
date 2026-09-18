@@ -244,3 +244,27 @@ main.manual { display: grid; grid-template-columns: minmax(0, 1fr); }
   .manual-body h2 { font-size: 22px; }
   .manual-body tr td:first-child { white-space: normal; }
 }
+
+/* ── Ventana del instalador (esp-web-tools, alojado en este sitio) ─────────────
+   Usa variables Material: basta con definirlas para que tome los colores y las
+   tipografías de CLAVE. El manifest.json no lleva diseño; esto sí. */
+ewt-install-dialog, esp-web-install-button {
+  --md-sys-color-primary: var(--yellow);
+  --md-sys-color-on-primary: var(--ink);
+  --md-sys-color-surface: var(--bg);
+  --md-sys-color-surface-container: var(--bg);
+  --md-sys-color-surface-container-high: var(--panel);
+  --md-sys-color-surface-container-highest: var(--panel);
+  --md-sys-color-on-surface: var(--white);
+  --md-sys-color-on-surface-variant: var(--soft);
+  --md-sys-color-secondary: var(--beige);
+  --md-sys-color-secondary-container: var(--panel);
+  --md-sys-color-on-secondary-container: var(--white);
+  --md-sys-color-outline-variant: #4A4A48;
+  --md-sys-color-error: var(--error);
+  --md-sys-color-scrim: #000;
+  --md-ref-typeface-brand: "CF Arche Grotesk", system-ui, sans-serif;
+  --md-ref-typeface-plain: "CF Arche Grotesk", system-ui, sans-serif;
+  --md-dialog-container-shape: 22px;
+  --esp-tools-button-border-radius: 16px;
+}

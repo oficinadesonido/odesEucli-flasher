@@ -57,6 +57,12 @@
       <section class="step">
         <h2 class="step-title"><span class="num">2</span>
           <span class="txt">Choose a sound for each channel. Empty channels keep their current sound.</span></h2>
+        <div class="actions">
+          <button type="button" class="btn sec small" id="btnZip" aria-describedby="zipState">choose .zip</button>
+        </div>
+        <p class="note small" id="zipState" aria-live="polite">A .zip with the 8 sounds also works: name each
+        file with its channel number first (<code>1 kick.wav</code>, <code>2 snare.wav</code>…).</p>
+        <input type="file" id="zipIn" accept=".zip,application/zip" hidden>
         <ul class="channels" id="slots"></ul>
         <div class="budget">
           <p class="budget-text" id="budgetText">Kit time: 0.0 s used · 13.9 s left</p>
@@ -73,7 +79,7 @@
           <span class="txt">Preview the kit. It goes to temporary memory and is lost when you turn CLAVE off.</span></h2>
         <div class="actions">
           <button class="btn" id="btnSend" disabled aria-describedby="connState">send kit</button>
-          <button class="btn sec" id="btnReset" disabled aria-describedby="connState">back to 808 kit</button>
+          <button class="btn sec" id="btnReset" disabled aria-describedby="connState">back to factory kit</button>
         </div>
         <p class="status" id="sendState" aria-live="polite"></p>
       </section>
@@ -140,27 +146,99 @@
     list.appendChild(li);
     const inp = li.querySelector("input[type=file]");
     li.querySelector("button").onclick = () => inp.click();
-    inp.onchange = async e => {
-      const f = e.target.files[0] || null;
-      files[i] = f;
-      lengths[i] = 0;
-      $("fn" + i).textContent = f ? f.name : "No file chosen";
-      setSt(i, "");
-      if (f) {
-        try {
-          const actx = new (window.AudioContext || window.webkitAudioContext)();
-          const buf = await actx.decodeAudioData(await f.arrayBuffer());
-          actx.close();
-          lengths[i] = Math.min(Math.ceil(buf.duration * SAMPLE_RATE), MAX_SECONDS * SAMPLE_RATE);
-          $("fn" + i).textContent = `${f.name} · ${secs(lengths[i])} s` + (buf.duration > MAX_SECONDS ? " (cut at 3 s)" : "");
-        } catch (err) {
-          files[i] = null;
-          setSt(i, "✗ can't read this file", "err");
-        }
-      }
-      updateBudget();
-    };
+    inp.onchange = e => setChannelFile(i, e.target.files[0] || null);
   });
+
+  // Carga un canal desde cualquier File/Blob (selector o .zip) y mide su duración.
+  async function setChannelFile(i, f, etiqueta) {
+    files[i] = f;
+    lengths[i] = 0;
+    const nombre = etiqueta || (f && f.name) || "";
+    $("fn" + i).textContent = f ? nombre : "No file chosen";
+    setSt(i, "");
+    if (f) {
+      try {
+        const actx = new (window.AudioContext || window.webkitAudioContext)();
+        const buf = await actx.decodeAudioData(await f.arrayBuffer());
+        actx.close();
+        lengths[i] = Math.min(Math.ceil(buf.duration * SAMPLE_RATE), MAX_SECONDS * SAMPLE_RATE);
+        $("fn" + i).textContent = `${nombre} · ${secs(lengths[i])} s` + (buf.duration > MAX_SECONDS ? " (cut at 3 s)" : "");
+      } catch (err) {
+        files[i] = null;
+        setSt(i, "✗ can't read this file", "err");
+      }
+    }
+    updateBudget();
+    return files[i] !== null;
+  }
+
+  // ── .zip con los 8 sonidos ───────────────────────────────────
+  // Lector propio: el navegador ya sabe inflar (DecompressionStream), así que no hace
+  // falta ninguna librería y la página sigue funcionando sin internet.
+  async function leerZip(file) {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const dv = new DataView(buf.buffer);
+    let eocd = -1;
+    for (let i = buf.length - 22; i >= 0 && i > buf.length - 66000; i--)
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error("not a .zip file");
+    const total = dv.getUint16(eocd + 10, true);
+    let p = dv.getUint32(eocd + 16, true);
+    const out = [];
+    for (let n = 0; n < total; n++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const metodo = dv.getUint16(p + 10, true);
+      const compSize = dv.getUint32(p + 20, true);
+      const nameLen = dv.getUint16(p + 28, true);
+      const extraLen = dv.getUint16(p + 30, true);
+      const commLen = dv.getUint16(p + 32, true);
+      const local = dv.getUint32(p + 42, true);
+      const nombre = new TextDecoder().decode(buf.subarray(p + 46, p + 46 + nameLen));
+      p += 46 + nameLen + extraLen + commLen;
+      if (nombre.endsWith("/") || nombre.startsWith("__MACOSX") || nombre.split("/").pop().startsWith("."))
+        continue;
+      const lNameLen = dv.getUint16(local + 26, true);
+      const lExtraLen = dv.getUint16(local + 28, true);
+      const ini = local + 30 + lNameLen + lExtraLen;
+      const datos = buf.subarray(ini, ini + compSize);
+      let salida;
+      if (metodo === 0) salida = datos;
+      else if (metodo === 8) {
+        const ds = new DecompressionStream("deflate-raw");
+        salida = new Uint8Array(await new Response(new Blob([datos]).stream().pipeThrough(ds)).arrayBuffer());
+      } else continue;                                  // método raro: se ignora
+      out.push({ nombre: nombre.split("/").pop(), datos: salida });
+    }
+    return out;
+  }
+
+  const zipState = (t, cls) => { $("zipState").textContent = t; $("zipState").className = "note small status " + (cls || ""); };
+  $("btnZip").onclick = () => $("zipIn").click();
+  $("zipIn").onchange = async e => {
+    const f = e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    zipState(`Reading ${f.name}…`);
+    let entradas;
+    try { entradas = await leerZip(f); }
+    catch (err) { zipState("✗ " + err.message, "err"); return; }
+    const puestos = [], sinNumero = [];
+    for (const en of entradas) {
+      const m = en.nombre.match(/^\s*0*([1-8])\b/);     // el número va primero: "3 hihat.wav"
+      if (!m) { sinNumero.push(en.nombre); continue; }
+      const i = +m[1] - 1;
+      const ok = await setChannelFile(i, new Blob([en.datos]), en.nombre);
+      if (ok) puestos.push(i + 1);
+    }
+    if (!puestos.length) {
+      zipState("✗ No file in the zip starts with a channel number (1–8). Rename them like \"1 kick.wav\".", "err");
+      return;
+    }
+    let msg = `✓ ${puestos.length} sounds from the zip → channels ${puestos.sort((a, b) => a - b).join(", ")}.`;
+    if (sinNumero.length) msg += ` Ignored (no channel number): ${sinNumero.slice(0, 4).join(", ")}${sinNumero.length > 4 ? "…" : ""}`;
+    zipState(msg, "ok");
+    logLine(`zip ${f.name}: ${puestos.length} sounds loaded`);
+  };
 
   function logLine(t) {
     const el = $("log");
@@ -386,7 +464,7 @@
       const line = await expect(["DONE"], 3000);
       logLine("Reset: " + line);
       for (let i = 0; i < 8; i++) setSt(i, "");
-      say("Back to the 808 kit.");
+      say("Back to the factory kit.");
     } catch (e) { logLine("Reset error: " + e.message); say("Error: " + explain(e.message)); }
   };
 
