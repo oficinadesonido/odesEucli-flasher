@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLAVE · Manual</title>
+<link rel="stylesheet" href="./clave.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+  <header class="site-header">
+    <a class="logo" href="./index.html"><img src="./assets/clave-logo.svg" alt="CLAVE — home"></a>
+    <nav class="site-nav" aria-label="CLAVE web tools">
+      <ul>
+        <li><a href="./index.html">Firmware (3.0)</a></li>
+        <li><a href="./kit.html">Upload Sound Kits</a></li>
+        <li><a href="./presets.html">Backup presets</a></li>
+        <li><a href="./manual.html" aria-current="page">Manual</a></li>
+      </ul>
+    </nav>
+    <div class="header-aside">
+      <img class="badges" src="./assets/badges.svg" alt="ODES, oficinadesonido.org · Creative Commons · Open Source Hardware · WEEE">
+      <p class="intro">Euclidean drum machine. 8 touch pads, one encoder and 3 knobs. Everything the machine does, for firmware 3.4.</p>
+    </div>
+  </header>
+
+  <main id="main" class="manual">
+    <h1>Manual</h1>
+    <div class="manual-actions">
+      <a class="btn" href="./ManualClave_EN_A4.pdf" target="_blank" rel="noopener">download PDF</a>
+    </div>
+    <nav class="manual-toc" aria-label="Sections"><a href="#quick-start">Quick start</a>
+      <a href="#the-8-channels">The 8 channels</a>
+      <a href="#controls">Controls</a>
+      <a href="#secondary-functions">Secondary functions</a>
+      <a href="#pattern-probability-length-and-linear-mode">Pattern: probability, length and linear mode</a>
+      <a href="#accents-strong-new-in-3-4-strong">Accents — <strong>new in 3.4</strong></a>
+      <a href="#presets">Presets</a>
+      <a href="#drum-kits">Drum kits</a>
+      <a href="#effects-14-modes">Effects — 14 modes</a>
+      <a href="#automation">Automation</a>
+      <a href="#connections-and-sync">Connections and sync</a>
+      <a href="#while-connected-to-the-computer-strong-new-in-3-4-strong">While connected to the computer — <strong>new in 3.4</strong></a>
+      <a href="#power-up-combos">Power-up combos</a>
+      <a href="#buttons-and-leds">Buttons and LEDs</a>
+      <a href="#other-changes-in-3-4">Other changes in 3.4</a>
+      <a href="#updating-the-firmware">Updating the firmware</a></nav>
+    <div class="manual-body">
+<blockquote><p>English version of <code>MANUAL_CLAVE.md</code>, updated for firmware <strong>3.4</strong> (2026-09-18). Sections marked <strong>new in 3.4</strong> describe what changed since the public 3.0.</p></blockquote>
+      <h2 id="quick-start">Quick start</h2>
+      <ul><li>Press <strong>play</strong>: the pattern starts.</li><li>Turn up the <strong>master knob</strong> (overall volume).</li><li>Touch a <strong>pad</strong> (1–8) to choose the channel you want to edit.</li><li>Turn the <strong>encoder</strong> to change the number of hits (K).</li><li><strong>pitch knob</strong> = tuning · <strong>level knob</strong> = volume of that channel.</li></ul>
+      <h2 id="the-8-channels">The 8 channels</h2>
+      <table class='wide'><tr><td>1</td><td>Kik</td><td>Kick</td></tr><tr><td>2</td><td>Snr4</td><td>Snare</td></tr><tr><td>3</td><td>CHH</td><td>Closed hi-hat</td></tr><tr><td>4</td><td>LTom</td><td>Low tom</td></tr><tr><td>5</td><td>Cnga</td><td>Conga</td></tr><tr><td>6</td><td>Cwbl</td><td>Cowbell</td></tr><tr><td>7</td><td>Marc</td><td>Maracas / shaker</td></tr><tr><td>8</td><td>Clap</td><td>Clap</td></tr></table>
+      <p>Each pad selects its channel and its LED shows the channel colour. The pad of the channel you are editing stays lit, at half brightness if that channel is muted. The pitch knob has a centre zone that snaps to the sample's original tuning; its LED tells you when you are there. Sequence length is global (1–16, 16 by default).</p>
+      <h2 id="controls">Controls</h2>
+      <h3>Transport and global</h3>
+      <table><tr><td>play</td><td>Play / stop</td></tr><tr><td>tempo (tap)</td><td>Tap the tempo in quarter notes</td></tr><tr><td>master knob</td><td>Overall volume</td></tr></table>
+      <h3>Pattern of the active channel</h3>
+      <table><tr><td>encoder</td><td>Hits K (or the cursor, in linear mode)</td></tr><tr><td>swEnc + encoder</td><td>Rotate the pattern</td></tr><tr><td>swEnc 2 s + encoder</td><td>Sequence length (1–16)</td></tr></table>
+      <h3>Sound of the active channel, and selection</h3>
+      <table><tr><td>pitch knob</td><td>Tuning</td></tr><tr><td>level knob</td><td>Volume (velocity)</td></tr><tr><td>pad 1–8</td><td>Choose channel</td></tr><tr><td>preset</td><td>Load (short) / save (2 s)</td></tr><tr><td>shift + preset</td><td>Kit selection mode</td></tr></table>
+      <h2 id="secondary-functions">Secondary functions</h2>
+      <p>Hold a modifier and move the control.</p>
+      <h3>shift +</h3>
+      <table><tr><td>encoder</td><td>Accents (how many)</td></tr><tr><td>swEnc + encoder</td><td>Rotate accents</td></tr><tr><td>swEnc (press)</td><td><strong>Accent the step under the cursor</strong> (linear mode only)</td></tr><tr><td>pitch knob</td><td>Accent amount (see "Accents" below)</td></tr><tr><td>level knob</td><td>Pan</td></tr><tr><td>mute</td><td>Linear / euclidean</td></tr><tr><td>tempo</td><td>Double tempo (2x)</td></tr><tr><td>preset</td><td>Kit selection</td></tr><tr><td>play short / 2 s</td><td>Record / clear automation</td></tr></table>
+      <h3>tempo +</h3>
+      <table><tr><td>encoder</td><td>BPM (fine adjust)</td></tr><tr><td>pitch knob</td><td>Channel probability</td></tr></table>
+      <h3>mute +</h3>
+      <table><tr><td>pad</td><td>Mute that channel</td></tr><tr><td>encoder</td><td>Effect amount (wet)</td></tr><tr><td>swEnc + encoder</td><td>Effect mode (14)</td></tr><tr><td>pitch / level knob</td><td>LP filter: cutoff / resonance</td></tr></table>
+      <h2 id="pattern-probability-length-and-linear-mode">Pattern: probability, length and linear mode</h2>
+      <p><strong>Probability</strong> (tempo + pitch knob): 16 = every hit plays · 0 = none · in between = random hit by hit, changing every lap without altering the euclidean pattern.</p>
+      <p><strong>Sequence length</strong> (hold swEnc 2 s): the ring turns amber; turn to choose 1–16 and press swEnc to exit.</p>
+      <p><strong>Linear mode</strong> (shift + mute): place the steps by hand. The encoder moves the cursor and swEnc turns the step under the cursor on or off. It works per channel, so you can have some channels euclidean and others linear in the same song.</p>
+      <p><strong>Accents in linear mode.</strong> In euclidean mode accents spread themselves out, like the hits. In linear mode you draw them: hold shift and press the encoder on the step you want to accent. If that step was off it turns on — an accent without a hit makes no sound.</p>
+      <p><strong>Changing mode erases nothing.</strong> Going from euclidean to linear you inherit the hits and accents exactly as they were playing. Going back to euclidean, the channel keeps playing what you drew: the formula only takes over again when you ask it to spread things out, that is when you add or remove hits, rotate, or change the number of accents.</p>
+      <h2 id="accents-strong-new-in-3-4-strong">Accents — <strong>new in 3.4</strong></h2>
+      <p><strong>shift + pitch knob</strong> sets the accent amount (0–12) for the active channel, and what it does depends on the channel:</p>
+      <table class='wide'><tr><td>Channels</td><td>What an accent does</td><td>The knob controls</td></tr><tr><td>1 kick · 2 snare · 3 hi-hat · 7 shaker · 8 clap</td><td>Accented hits play at full volume</td><td>How much the <strong>non-accented</strong> hits drop: from −3 dB (left) to −12 dB (right)</td></tr><tr><td>4 tom · 5 conga · 6 cowbell</td><td>Accented hits play at full volume <strong>and higher in pitch</strong></td><td>How many semitones the accent goes up (0–12)</td></tr></table>
+      <p>Before 3.4 the knob did nothing on channels 1, 2, 7 and 8, and on the hi-hat it swapped the accent for a fixed 808 sound. To have no accents at all, set the number of accents to 0 (shift + encoder).</p>
+      <h2 id="presets">Presets</h2>
+      <p><strong>80 slots</strong>: 48 factory ones — 16 green, 16 hip hop in orange and 16 latin in yellow — and <strong>32 of your own</strong>, stored in internal memory.</p>
+      <p>When loading and saving, <strong>used</strong> slots are lit and <strong>empty</strong> ones are dark (blue and purple user banks). While saving, shift + swEnc empties the slot.</p>
+      <p>A preset stores, for the 8 channels: pattern (K, rotation, accents), pitch, velocity, pan, linear mode, double tempo and probability; plus the sequence length and the automation.</p>
+      <p><strong>Every preset stores its own tempo</strong>, but only imposes it if you load it while the machine is <strong>stopped</strong>: loading a preset then is choosing the tempo you are about to start with. While playing, the BPM you already have wins, so changing preset live never breaks the pulse, and stop/play doesn't move it either. Factory presets carry no tempo of their own and respect yours.</p>
+      <p><strong>Not</strong> stored in the preset, because they are global: the kit, the effect and the mute state.</p>
+      <h3>Backing up presets to your computer — <strong>new in 3.4</strong></h3>
+      <p>The <em>Backup presets</em> page of the webflasher can read every preset you saved, download them as a <code>.txt</code> file and <strong>load them back into CLAVE</strong>, each one into the slot it came from. Slots that are not in the file are left alone. The machine must be stopped. Older backup files (firmware 3.0) can't be loaded back: they don't contain the whole preset.</p>
+      <h2 id="drum-kits">Drum kits</h2>
+      <p>There are <strong>9 kits</strong>: 5 factory ones (green on the ring) and 4 user ones (purple, only if they have content).</p>
+      <table><tr><td>shift + preset</td><td>Enter and leave kit selection mode</td></tr><tr><td>encoder</td><td>Browse the available kits (ring)</td></tr><tr><td>swEnc</td><td>Load the highlighted kit and exit</td></tr></table>
+      <p><strong>Uploading your own kits:</strong> from the <em>Upload Sound Kits</em> page of the webflasher you can preview 8 samples (one per channel) and save them to a user slot (1–4). They stay in the machine when you turn it off, and the chosen kit is remembered at power-up.</p>
+      <p><strong>How to prepare your samples</strong></p>
+      <ul><li>Mono WAV, 44.1 kHz, 16 or 24 bit. Whatever you upload ends up mono, 44.1 kHz, 16 bit.</li><li>Up to <strong>3 s per sound</strong> and about <strong>14 s in total</strong> for the 8 sounds of the kit. Shorter is better.</li><li>No silence at the start, so the hit doesn't arrive late.</li><li>Normalize close to 0 dB: the page doesn't change the volume.</li><li>A short fade-out at the end is <strong>added by the machine</strong> (new in 3.4), so a sample that ends abruptly</li></ul>
+      <p>or gets cut at 3 s won't click.</p>
+      <ul><li>The output is stereo: each channel has its own pan.</li></ul>
+      <h2 id="effects-14-modes">Effects — 14 modes</h2>
+      <p>Cycle through them with mute + swEnc + encoder (one LED lights up in the colour of the effect) and set the amount (wet) with mute + encoder. Only one effect is active at a time and it is global: it is not saved in the preset.</p>
+      <p>The first 8 combine <strong>delay + reverb</strong> (magenta LED):</p>
+      <table><tr><td>Room</td><td>reverb only (short)</td></tr><tr><td>Hall</td><td>reverb only (long)</td></tr><tr><td>Delay 1/8</td><td>delay only</td></tr><tr><td>Delay 1/4</td><td>delay only</td></tr><tr><td>Dub</td><td>dark delay + reverb</td></tr><tr><td>Slap+Room</td><td>slap + short reverb</td></tr><tr><td>1/4+Hall</td><td>delay + long reverb</td></tr><tr><td>Ambient</td><td>delay + wide reverb</td></tr></table>
+      <p>The other 6 are processing effects, each with its own LED colour:</p>
+      <table class='wide'><tr><td>orange</td><td>SP404</td><td>Warm saturation / compression</td></tr><tr><td>red</td><td>Distortion</td><td>Aggressive clipping</td></tr><tr><td>cyan</td><td>Bitcrush</td><td>Fewer bits and lower sample rate (lo-fi)</td></tr><tr><td>green</td><td>Comb</td><td>Resonant comb filter, tuned to the tempo</td></tr><tr><td>blue</td><td>Short flanger</td><td>Narrow sweep, synced to the tempo</td></tr><tr><td>purple</td><td>Fast flanger</td><td>Wide, fast sweep, synced</td></tr></table>
+      <p><strong>Reverb and delay amount — new in 3.4.</strong> The bar is no longer a straight mix amount: a full bar is about 25% of what it used to be, and it rises gradually (1 click ≈ 0.2%, half bar ≈ 16%, full bar 65%). This makes the small settings usable on a drum machine, where a little goes a long way. The processing effects (SP404, distortion, bitcrush, comb, flangers) are unchanged.</p>
+      <p>The processing effects work on the signal coming in: if the overall volume is low, turn the master knob up to hear them properly.</p>
+      <p><strong>Resonant LP filter:</strong> mute + knobs, affects the whole mix, before the effects. <strong>Master compressor:</strong> always on internally.</p>
+      <h2 id="automation">Automation</h2>
+      <p>Records 2 bars of pitch (per channel) and of the filter, looping.</p>
+      <table><tr><td>shift + play short</td><td>Start recording (the channel LED blinks)</td></tr><tr><td>play</td><td>Leave recording — the automation keeps playing</td></tr><tr><td>play again</td><td>Stop</td></tr><tr><td>shift + play 2 s</td><td>Clear</td></tr></table>
+      <p>While you record one channel, the automation of the others keeps playing. The filter is only recorded if you move it. Probability is not automated: it is a fixed value per channel.</p>
+      <h2 id="connections-and-sync">Connections and sync</h2>
+      <table><tr><td>Audio</td><td>1 × 3.5 mm stereo jack (output)</td></tr><tr><td>Clock sync</td><td>2 jacks: in and out</td></tr><tr><td>USB-C</td><td>2 ports: power, and data / MIDI</td></tr><tr><td>Power</td><td>5 V over USB-C</td></tr></table>
+      <blockquote><p>⚠️ <strong>Only connect sync in with CLAVE powered on</strong>, and if the clock comes from a passive multiple use a buffered one (or a dedicated output on your clock): CLAVE's input can load the signal and disturb the other modules.</p></blockquote>
+      <p><strong>Clock input — new in 3.4.</strong> CLAVE works out the resolution on its own: 1, 2, 4 or 24 pulses per quarter note (PPQN). For 1, 2 and 4 PPQN it picks the one that puts the tempo between 80 and 160 BPM. If your tempo is outside that range (170 BPM would read as 85, for example), <strong>tap TEMPO in quarter notes</strong> with the clock connected: CLAVE picks the resolution that matches your tap and remembers it. It follows the tempo even while stopped, and when you press <strong>play</strong> it starts on the next pulse, in time. If the master changes BPM, CLAVE follows within one or two pulses; the more PPQN your clock sends, the tighter the tracking.</p>
+      <p><strong>Clock output:</strong> 2 PPQN (one pulse every two steps), 50% square wave, steady tempo. Low while stopped; 3.3 V logic. Two CLAVEs chain directly: sync out of one into sync in of the other.</p>
+      <p>CLAVE also follows external <strong>MIDI clock</strong> over USB (24 PPQN); while USB clock is present the jack input is ignored.</p>
+      <h2 id="while-connected-to-the-computer-strong-new-in-3-4-strong">While connected to the computer — <strong>new in 3.4</strong></h2>
+      <p>When one of the webflasher pages is connected to CLAVE and the machine is stopped, the ring breathes slowly in <strong>orange</strong>: that means "connected". While presets or samples are loading, the ring fills up like a <strong>progress bar</strong>, and a <strong>green flash</strong> means it finished. Press play and the ring goes back to showing the sequence, so you can try a kit while still connected.</p>
+      <h2 id="power-up-combos">Power-up combos</h2>
+      <p>Hold the buttons <strong>while you plug in the USB</strong> (or while you reset). The light of the mode comes on as soon as the machine sees the combination, even if you are still holding it. To leave and carry on booting, <strong>click the encoder</strong> (swEnc); if you don't touch anything it leaves on its own after 30 s. Every setting is stored: it survives power-off.</p>
+      <table><tr><td>shift + play</td><td>Download mode, to install firmware from the browser (this one enters on its own)</td></tr><tr><td>swEnc</td><td>Reverse the encoder direction (release it, then click again to carry on)</td></tr><tr><td>shift + tempo</td><td>LED brightness: turn the encoder and leave with a click</td></tr><tr><td>preset + play</td><td>Colour-blind palette</td></tr><tr><td>mute + play</td><td>Left-handed mode</td></tr><tr><td>play + tempo</td><td>Start-up preset: random or the last one used</td></tr></table>
+      <p><strong>Brightness.</strong> The ring, the indicators and the pads dim together. Useful for playing in the dark or for recording video. <strong>New in 3.4:</strong> the maximum is 50%, because the LEDs are what draws the most current and above that the touch sensor can lose power. Colours stay readable all the way down to the minimum.</p>
+      <p><strong>Colour-blind mode.</strong> Swaps the colours of the eight channels for a palette that can be told apart with any kind of colour blindness, and keeps the two that could still be confused as far apart as possible on the ring. An accent stops being a complementary colour and becomes the same colour, brighter.</p>
+      <p><strong>Left-handed mode.</strong> Bars are drawn from the top towards the right. By default they start at the bottom and climb up the left side, because your right hand covers the right side of the ring when you turn the encoder.</p>
+      <h2 id="buttons-and-leds">Buttons and LEDs</h2>
+      <table><tr><td>play</td><td>play / stop</td></tr><tr><td>preset</td><td>load / save</td></tr><tr><td>tempo</td><td>tap tempo</td></tr><tr><td>mute</td><td>mute and effects</td></tr><tr><td>shift</td><td>modifier</td></tr><tr><td>swEnc</td><td>encoder switch</td></tr></table>
+      <p><strong>16-LED ring</strong>: the steps of the active channel, in its colour. Accents use a different colour and empty steps stay dark. The white playback cursor only appears while playing; stopped, you see the real state of every step. In linear mode a dot also marks where the encoder cursor is.</p>
+      <p>The <strong>bars</strong> — effect, filter, probability, tempo, accents, length — start at the bottom and climb up the left side, so your hand doesn't cover what you are adjusting. The <strong>mute view</strong> uses that same left half: one LED per channel, lit if it sounds.</p>
+      <p><strong>The 4 indicators</strong>: original pitch · sequence mode of the channel · reserved · automation (blinks while recording, steady while playing back; in the preset and kit views it shows the bank).</p>
+      <p><strong>The 8 pad LEDs</strong>: in the mute view they show which channel sounds. Outside it, they mark the channel you are editing.</p>
+      <h2 id="other-changes-in-3-4">Other changes in 3.4</h2>
+      <ul><li><strong>Pitch knob:</strong> it no longer drifts on its own at the edge of the snap zone. The white pitch LED and</li></ul>
+      <p>the tuning stay put, and leaving the zone now moves by one semitone instead of two.</p>
+      <ul><li><strong>Filter and effects:</strong> the master filter now runs on the mix before the effects, so filter + reverb</li></ul>
+      <p>no longer breaks up.</p>
+      <ul><li><strong>Kick and toms:</strong> no more click when a sound retriggers while its tail is still ringing.</li></ul>
+      <h2 id="updating-the-firmware">Updating the firmware</h2>
+      <p>Connect the machine over USB and open the webflasher in desktop <strong>Chrome</strong>, <strong>Edge</strong> or <strong>Brave</strong> (it does not work in Firefox or Safari). Kits and presets are uploaded from there too.</p>
+      <p>https://oficinadesonido.github.io/odesEucli-flasher/mini/</p>
+      <p>To put the machine in download mode, hold <strong>shift + play</strong> while you plug the USB cable in. Installing firmware keeps your presets and your saved kits.</p>
+      <blockquote><p>Note: firmware 3.4 is not on the public webflasher yet — that page still installs 3.0.</p></blockquote>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>CLAVE user manual · firmware 3.4 · oficina de sonido · oficinadesonido.org</p>
+  </footer>
+</div>
+</body>
+</html>
