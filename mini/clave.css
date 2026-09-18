@@ -51,6 +51,11 @@ body {
 .site-nav a[aria-current="page"] { color: var(--yellow); }
 
 .header-aside .badges { display: block; width: 130px; max-width: 100%; height: auto; }
+/* La url va como texto de la página, estirada al ancho exacto del logotipo (130 px). */
+.badges-url { display: block; width: 130px; margin-top: 7px; }
+.badges-url svg { display: block; width: 100%; height: auto; }
+.badges-url text { fill: var(--soft); font-family: "CF Arche Grotesk", system-ui, sans-serif; font-size: 8px; letter-spacing: 0; }
+.badges-url:hover text { fill: var(--yellow); }
 .intro {
   margin: 28px 0 0;
   color: var(--yellow);
