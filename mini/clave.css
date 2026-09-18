@@ -50,7 +50,7 @@ body {
 }
 .site-nav a[aria-current="page"] { color: var(--yellow); }
 
-.header-aside .badges { display: block; width: 210px; max-width: 100%; height: auto; }
+.header-aside .badges { display: block; width: 130px; max-width: 100%; height: auto; }
 .intro {
   margin: 28px 0 0;
   color: var(--yellow);
