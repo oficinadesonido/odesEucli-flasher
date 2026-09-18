@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CLAVE · Firmware</title>
 <link rel="stylesheet" href="./clave.css">
-<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<!-- esp-web-tools alojado acá: sin depender de unpkg y con el emoji de CLAVE al terminar -->
+<script type="module" src="./esp-web-tools/install-button.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -22,9 +23,9 @@
     </nav>
     <div class="header-aside">
       <img class="badges" src="./assets/badges.svg" alt="ODES, oficinadesonido.org · Creative Commons · Open Source Hardware · WEEE">
-      <p class="intro">Use the desktop version of Chrome, Edge or Brave. Installing the firmware
-      keeps your presets and your saved sound kits. CLAVE is a Euclidean drum machine
-      (ESP32-S3, red board v3).</p>
+      <p class="intro">Use the desktop version of Chrome, Edge or Brave. CLAVE is a Euclidean drum
+      machine (ESP32-S3, red board v3). Before installing, leave the <b>Erase device</b> checkbox
+      unchecked to keep your presets and your saved sound kits.</p>
     </div>
   </header>
 
@@ -76,7 +77,7 @@
       <p>The right port is called <code>USB JTAG/serial debug unit</code>.</p>
       <p>Close any other page or app that is using CLAVE's USB port (for example
       Upload Sound Kits in another tab).</p>
-      <p>Your presets and saved sound kits are not erased.</p>
+      <p>Leave <code>Erase device</code> unchecked and your presets and saved sound kits stay in place; ticking it wipes everything.</p>
     </aside>
   </main>
 
