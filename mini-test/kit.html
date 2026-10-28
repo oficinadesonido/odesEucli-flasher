@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eucliMini · Subir kit</title>
+<style>
+  body { font-family: 'Lato', system-ui, sans-serif; max-width: 640px; margin: 40px auto;
+         padding: 0 20px; color: #222; line-height: 1.5; }
+  h1 { color: #1565c0; margin-bottom: 2px; }
+  .sub { color: #777; margin-top: 0; }
+  .card { background: #f7f7f5; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  button { font: inherit; background: #1565c0; color: #fff; border: 0; border-radius: 8px;
+           padding: 10px 16px; cursor: pointer; margin: 4px 0; }
+  button.sec { background: #fff; color: #1565c0; border: 1.5px solid #1565c0; }
+  button:disabled { opacity: .45; cursor: default; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 5px 4px; vertical-align: middle; }
+  td.name { font-weight: 600; width: 64px; }
+  td.st { font-size: 12px; color: #777; width: 120px; }
+  input[type=file] { font: inherit; font-size: 13px; }
+  #log { white-space: pre-wrap; font-family: 'DejaVu Sans Mono', monospace; font-size: 11px;
+         background: #111; color: #6f6; padding: 10px; border-radius: 8px; max-height: 200px;
+         overflow: auto; margin-top: 10px; }
+  .ok { color: #1565c0; font-weight: 600; }
+  .err { color: #c62828; font-weight: 600; }
+  .warn { background: #fff7e6; border-left: 4px solid #e0a800; padding: 8px 12px; font-size: .9em; }
+  ol { padding-left: 20px; } li { margin: 3px 0; }
+</style>
+</head>
+<body>
+  <h1>Subir kit · eucliMini</h1>
+  <p class="sub">Carga tus propios samples de batería (uno por canal) y pruébalos al instante.
+  No se reinstala el firmware: los samples van a la memoria de la máquina.</p>
+
+  <div class="warn">
+    Usa <b>Chrome</b> o <b>Edge</b> de escritorio. <b>Detén el secuenciador</b> (Play en OFF)
+    antes de enviar. Primero <b>audicionás</b> el kit (paso 3, se pierde al apagar); si te gusta,
+    lo <b>guardás en un slot de usuario</b> (paso 4) y queda <b>aunque apagues</b>. Cada sample es
+    one-shot, ideal &lt; 2 s. Se convierten a mono 44.1&nbsp;kHz automáticamente.
+  </div>
+
+  <div class="card">
+    <b>1.</b> Conecta la máquina por el USB-C <b>J1</b> (sin aparato MIDI enchufado) y pulsa:<br>
+    <button id="btnConnect">🔌 Conectar máquina</button>
+    <button id="btnPing" class="sec" disabled>📡 Ping (V)</button>
+    <span id="connState"></span>
+  </div>
+
+  <div class="card">
+    <b>2.</b> Elige un WAV/AIFF/MP3 para cada canal (los vacíos se quedan con el sonido actual):
+    <table id="slots"></table>
+  </div>
+
+  <div class="card">
+    <b>3.</b> Audiciónalos (van a memoria temporal, se pierden al apagar):<br>
+    <button id="btnSend" disabled>⬆️ Enviar kit a la máquina (audición)</button>
+    <button id="btnReset" class="sec" disabled>↩️ Volver al kit 808</button>
+  </div>
+
+  <div class="card">
+    <b>4.</b> Si te gusta, <b>guárdalo</b> en un slot de usuario (queda al apagar):<br>
+    <button class="sec slotSave" data-slot="0" disabled>💾 Slot 1</button>
+    <button class="sec slotSave" data-slot="1" disabled>💾 Slot 2</button>
+    <button class="sec slotSave" data-slot="2" disabled>💾 Slot 3</button>
+    <button class="sec slotSave" data-slot="3" disabled>💾 Slot 4</button>
+    <p class="sub" style="font-size:.85em;margin:6px 0 0">En la máquina, elige el kit con
+      <b>shift + preset</b> (los 4 LED morados del anillo son tus slots).</p>
+  </div>
+
+  <div class="card">
+    <div id="log">— sin conectar —</div>
+  </div>
+
+<script>
+  const NAMES = ["Kik","Snr4","CHH","LTom","Cnga","Cwbl","Marc","Clap"];
+  const SAMPLE_RATE = 44100;
+  const MAX_SECONDS = 3;                 // tope por sample
+  const $ = id => document.getElementById(id);
+
+  // ── UI de slots ──────────────────────────────────────────────
+  const files = new Array(8).fill(null);
+  const tbl = $("slots");
+  NAMES.forEach((nm, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td class="name">${i}· ${nm}</td>
+      <td><input type="file" accept="audio/*" data-slot="${i}"></td>
+      <td class="st" id="st${i}"></td>`;
+    tbl.appendChild(tr);
+  });
+  tbl.querySelectorAll("input[type=file]").forEach(inp => {
+    inp.onchange = e => { files[e.target.dataset.slot] = e.target.files[0] || null; };
+  });
+
+  function logLine(t) {
+    const el = $("log");
+    el.textContent += (el.textContent === "— sin conectar —" ? "" : "\n") + t;
+    el.scrollTop = el.scrollHeight;
+  }
+  const setSt = (i, t, cls) => { const e = $("st"+i); e.textContent = t; e.className = "st " + (cls||""); };
+
+  // ── Web Serial: lector de líneas con cola y espera por token ──
+  let port, reader, writer, rxBuf = "";
+  const lineQueue = [], lineWaiters = [];
+
+  function feed(text) {
+    rxBuf += text;
+    let idx;
+    while ((idx = rxBuf.indexOf("\n")) >= 0) {
+      const line = rxBuf.slice(0, idx).replace(/\r$/, "");
+      rxBuf = rxBuf.slice(idx + 1);
+      if (line !== "ACK") logLine("« " + line);   // ACK omitido (uno por chunk)
+      if (lineWaiters.length) lineWaiters.shift()(line);
+      else lineQueue.push(line);
+    }
+  }
+  function nextLine(timeoutMs) {
+    if (lineQueue.length) return Promise.resolve(lineQueue.shift());
+    return new Promise((resolve, reject) => {
+      const res = line => { clearTimeout(t); resolve(line); };
+      const t = setTimeout(() => {
+        const k = lineWaiters.indexOf(res); if (k >= 0) lineWaiters.splice(k, 1);
+        reject(new Error("timeout"));
+      }, timeoutMs);
+      lineWaiters.push(res);
+    });
+  }
+  // Espera una línea que empiece por alguno de los prefijos (o ERR → la devuelve igual).
+  async function expect(prefixes, timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      const line = await nextLine(Math.max(50, deadline - Date.now()));
+      if (line.startsWith("ERR")) return line;
+      for (const p of prefixes) if (line.startsWith(p)) return line;
+    }
+    throw new Error("timeout esperando " + prefixes.join("/"));
+  }
+  async function readLoop() {
+    const dec = new TextDecoder();
+    let total = 0;
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) { logLine("‹stream cerrado (done)›"); break; }
+        if (value) { total += value.length; feed(dec.decode(value)); }
+      }
+    } catch (e) { logLine("‹read error: " + e.message + "›"); }
+    logLine("‹readLoop terminó, " + total + " bytes›");
+  }
+
+  $("btnConnect").onclick = async () => {
+    if (!("serial" in navigator)) { $("connState").textContent = " — navegador sin Web Serial"; return; }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 115200 });
+      $("log").textContent = "Conectada (sin tocar DTR/RTS).";
+      reader = port.readable.getReader();
+      writer = port.writable.getWriter();
+      readLoop();
+      $("connState").innerHTML = ' <span class="ok">conectada ✓</span>';
+      $("btnSend").disabled = false;
+      $("btnReset").disabled = false;
+      $("btnPing").disabled = false;
+      document.querySelectorAll(".slotSave").forEach(b => b.disabled = false);
+      logLine("Pulsa 📡 Ping para probar la respuesta de la placa.");
+    } catch (e) { $("connState").textContent = " — " + e.message; }
+  };
+
+  $("btnPing").onclick = async () => {
+    try { logLine("» V"); await writer.write(new TextEncoder().encode("V")); }
+    catch (e) { logLine("error escribiendo: " + e.message); }
+  };
+
+  // ── Conversión WAV → int16 mono @ 44.1k ──────────────────────
+  async function decodeMono44k(file) {
+    const arr = await file.arrayBuffer();
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await actx.decodeAudioData(arr);
+    actx.close();
+    let frames = Math.ceil(buf.duration * SAMPLE_RATE);
+    if (frames > MAX_SECONDS * SAMPLE_RATE) frames = MAX_SECONDS * SAMPLE_RATE; // recorta
+    const off = new OfflineAudioContext(1, frames, SAMPLE_RATE);
+    const src = off.createBufferSource();
+    src.buffer = buf; src.connect(off.destination); src.start();
+    const rendered = await off.startRendering();
+    const f32 = rendered.getChannelData(0);
+    const i16 = new Int16Array(f32.length);
+    for (let i = 0; i < f32.length; i++) {
+      const s = Math.max(-1, Math.min(1, f32[i]));
+      i16[i] = s < 0 ? (s * 0x8000) | 0 : (s * 0x7fff) | 0;
+    }
+    return i16;
+  }
+
+  // ── Subida de un slot (protocolo 'K') ────────────────────────
+  async function uploadSlot(slot, i16) {
+    const n = i16.length;
+    const hdr = new Uint8Array(6);
+    hdr[0] = "K".charCodeAt(0); hdr[1] = slot;
+    hdr[2] = n & 0xff; hdr[3] = (n >> 8) & 0xff; hdr[4] = (n >> 16) & 0xff; hdr[5] = (n >>> 24) & 0xff;
+    logLine("» K slot=" + slot + " n=" + n);
+    await writer.write(hdr);
+    let line = await expect(["RDY"], 4000);
+    if (line.startsWith("ERR")) throw new Error(line);
+
+    const bytes = new Uint8Array(i16.buffer, i16.byteOffset, n * 2);
+    let sum = 0;
+    for (let off = 0; off < bytes.length; off += 2048) {
+      const chunk = bytes.subarray(off, Math.min(off + 2048, bytes.length));
+      for (let k = 0; k < chunk.length; k++) sum = (sum + chunk[k]) & 0xffff;
+      await writer.write(chunk);
+      line = await expect(["ACK"], 6000);
+      if (line.startsWith("ERR")) throw new Error(line);
+      setSt(slot, "enviando… " + Math.round((off + chunk.length) / bytes.length * 100) + "%");
+    }
+    const cs = new Uint8Array([sum & 0xff, (sum >> 8) & 0xff]);
+    await writer.write(cs);
+    line = await expect(["DONE"], 4000);
+    if (line.startsWith("ERR")) throw new Error(line);
+  }
+
+  $("btnSend").onclick = async () => {
+    const chosen = files.map((f, i) => [i, f]).filter(x => x[1]);
+    if (!chosen.length) { logLine("No elegiste ningún sample."); return; }
+    $("btnSend").disabled = true; $("btnReset").disabled = true;
+    for (const [i] of chosen) setSt(i, "convirtiendo…");
+    try {
+      for (const [i, f] of chosen) {
+        setSt(i, "convirtiendo…");
+        const i16 = await decodeMono44k(f);
+        logLine(`slot ${i} (${NAMES[i]}): ${i16.length} muestras`);
+        await uploadSlot(i, i16);
+        setSt(i, "✓ cargado", "ok");
+        logLine(`slot ${i}: DONE`);
+      }
+      logLine("Kit cargado. Pulsa Play y prueba.");
+    } catch (e) {
+      logLine("Error: " + e.message);
+    }
+    $("btnSend").disabled = false; $("btnReset").disabled = false;
+  };
+
+  $("btnReset").onclick = async () => {
+    try {
+      await writer.write(new Uint8Array([ "X".charCodeAt(0), 0xFF ]));
+      const line = await expect(["DONE"], 3000);
+      logLine("Reset: " + line);
+      for (let i = 0; i < 8; i++) setSt(i, "");
+    } catch (e) { logLine("Error reset: " + e.message); }
+  };
+
+  // ── Guardar el kit audicionado (en PSRAM) a un slot de usuario ('S') ──
+  async function saveToSlot(u) {
+    try {
+      logLine("» S slot=" + (u + 1));
+      await writer.write(new Uint8Array([ "S".charCodeAt(0), u ]));
+      const line = await expect(["DONE"], 8000);   // borra+escribe flash: puede tardar
+      if (line.startsWith("ERR")) {
+        logLine("⚠ No se guardó (" + line + "). ¿Audicionaste un kit antes (paso 3)?");
+      } else {
+        logLine("✓ Guardado en slot " + (u + 1) + " (queda al apagar).");
+      }
+    } catch (e) { logLine("Error guardando: " + e.message); }
+  }
+  document.querySelectorAll(".slotSave").forEach(b => {
+    b.onclick = () => saveToSlot(parseInt(b.dataset.slot, 10));
+  });
+</script>
+</body>
+</html>
